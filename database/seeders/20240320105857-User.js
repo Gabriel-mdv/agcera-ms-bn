@@ -9,6 +9,7 @@ module.exports = {
       name: 'John Doe',
       email: 'hjdksd@gmail.com',
       password: '1234',
+      phone: '+123456789023',
       createdAt: new Date(),
     }], {});
   },
