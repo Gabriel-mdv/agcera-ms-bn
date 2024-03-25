@@ -1,15 +1,28 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional } from "sequelize";
+import { Model, DataTypes, InferAttributes, InferCreationAttributes, ForeignKey,CreationOptional } from "sequelize";
 import { Sequelize, sequelize } from ".";
+import Shop from "./shop";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-  declare id: string;
-  declare name: string;
-  declare password: string;
+  declare id: String |null;
+  declare name: String;
+  declare password: String;
   declare email: String | null;
-
-  declare readonly createdAt: Date;
+  declare phone: String;
+  declare gender: String |null;
+  declare location: String ;
+  declare role: String;
+  declare isActive: Boolean |null;
+  declare readonly createdAt: Date |null;
   declare updatedAt:  Date | null;
   declare deletedAt: Date | null;
+
+  static associate(models: {Shop: typeof Shop}){
+    User.belongsTo(models.Shop, {
+      foreignKey: 'shopId',
+      as: 'shop'
+    })
+  }
+
 }
 
 // class User extends Model {}
@@ -31,19 +44,54 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    email: DataTypes.STRING,
+    email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
+    
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
     },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    gender: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'unspecified'
+    },
+
+    location: {
+      type: DataTypes.STRING,
+      allowNull:false,
+      defaultValue: 'Maputo Center'
+    },
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "user",
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+ 
     updatedAt: DataTypes.DATE,
     deletedAt: DataTypes.DATE,
+
   },
+
   {
     sequelize,
     modelName: "User",
     tableName: "Users",
   }
+  
 );
 
 export default User;
