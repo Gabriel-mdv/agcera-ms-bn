@@ -1,9 +1,7 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional } from "sequelize";
-import { Sequelize, sequelize } from ".";
-import User from "./user";
+import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional, Sequelize, Association } from "sequelize";
+import { User } from './user';
 
-
-class Shop extends Model<InferAttributes<Shop>, InferCreationAttributes<Shop>> {
+export class Shop extends Model<InferAttributes<Shop>, InferCreationAttributes<Shop>> {
   declare id: String |null;
   declare name: String;
   declare phone: String;
@@ -13,37 +11,38 @@ class Shop extends Model<InferAttributes<Shop>, InferCreationAttributes<Shop>> {
   declare updatedAt:  Date | null;
   declare deletedAt: Date | null;
 
-  static associate(models: {User: typeof User}) {
-    Shop.hasMany(models.User, {
-      foreignKey: 'shopId',
-      as: 'users'
-    });
-  }
+  declare static associations: {
+    users: Association<Model<any, any>, Model<any, any>>;
+  };
 }
 
-Shop.init({
-  id: {
-    unique: true,
-    allowNull: false,
-    primaryKey: true,
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-  },
-  name: DataTypes.STRING,
-  location: DataTypes.STRING,
-  phone: DataTypes.STRING,
-  isOpen: DataTypes.STRING,
-  createdAt: DataTypes.DATE,
-  updatedAt: DataTypes.DATE,
-  deletedAt: DataTypes.DATE,
-}, {
-  sequelize,
-  modelName: 'Shop',
-  tableName: 'shops'
-});
+export default (sequelize: Sequelize) => {
 
+  Shop.hasMany(User, {
+    foreignKey: 'shopId',
+    as: 'users',
+  })
 
-Shop.associate({User})
+  Shop.init({
+    id: {
+      unique: true,
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+    },
+    name: DataTypes.STRING,
+    location: DataTypes.STRING,
+    phone: DataTypes.STRING,
+    isOpen: DataTypes.STRING,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+    deletedAt: DataTypes.DATE,
+  }, {
+    sequelize,
+    modelName: 'Shop',
+    tableName: 'shops'
+  });
 
-
-  export default Shop;
+  return Shop;
+}

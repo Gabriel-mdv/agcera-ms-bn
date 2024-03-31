@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwtFunctions';
-import User from '../../database/models/user';
+import  { User } from '@database/models/user';
 import { ParamsDictionary } from 'express-serve-static-core';
 
 const checkRoleMiddleware =  (requiredRole: string) => {
@@ -10,7 +10,7 @@ const checkRoleMiddleware =  (requiredRole: string) => {
 
         // Check if the token exists
         if (!token) {
-            return res.status(401).json({ 
+            return res.status(401).json({
                 statu: 'fail',
                 message: 'Unauthorized. Please Login!' });
         }
@@ -21,7 +21,7 @@ const checkRoleMiddleware =  (requiredRole: string) => {
 
          // Check if the token is valid
          if (!decoded_token) {
-            return res.status(401).json({ 
+            return res.status(401).json({
                 status: 'fail',
                 message: 'Unauthorized. Please Login!' });
         }
@@ -31,7 +31,7 @@ const checkRoleMiddleware =  (requiredRole: string) => {
 
         // Check if the user exists
         if (!id) {
-            return res.status(401).json({ 
+            return res.status(401).json({
                 status: 'fail',
                 message: 'Unauthorized. Please Login as a valid user!' });
         }
@@ -40,7 +40,7 @@ const checkRoleMiddleware =  (requiredRole: string) => {
 
         // Check if the user exists
         if (!user) {
-            return res.status(401).json({ 
+            return res.status(401).json({
                 status: 'fail',
                 message: 'Unauthorized. Please Login as a valid user!' });
         }
@@ -54,7 +54,7 @@ const checkRoleMiddleware =  (requiredRole: string) => {
         // Check if the user has the required role
         if (user.role !== requiredRole) {
             req.user = user;
-            return res.status(403).json({ 
+            return res.status(403).json({
                 status: 'fail',
                 message: 'Access Forbidden' });
         }

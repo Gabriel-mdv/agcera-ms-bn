@@ -1,7 +1,7 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional } from "sequelize";
-import { Sequelize, sequelize } from ".";
+import { Model, DataTypes, InferAttributes, InferCreationAttributes, Sequelize, ForeignKey } from "sequelize";
+import { Shop } from "./shop";
 
-class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: String |null;
   declare name: String;
   declare password: String;
@@ -15,75 +15,72 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare updatedAt:  Date | null;
   declare deletedAt: Date | null;
 
+  declare shopId: ForeignKey<Shop['id']>;
 }
 
-// class User extends Model {}
+export default (sequelize: Sequelize) => {
+  User.init(
+    {
+      id: {
+        unique: true,
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
+      name:{
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
 
-User.init(
-  {
-    id: {
-      unique: true,
-      allowNull: false,
-      primaryKey: true,
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-    },
-    name:{
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      unique: true,
-    
-    },
-    createdAt: {
-      allowNull: false,
-      type: DataTypes.DATE,
-    },
-    phone: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    gender: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'unspecified'
-    },
+      },
+      createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE,
+      },
+      phone: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      gender: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'unspecified'
+      },
 
-    location: {
-      type: DataTypes.STRING,
-      allowNull:false,
-      defaultValue: 'Maputo Center'
+      location: {
+        type: DataTypes.STRING,
+        allowNull:false,
+        defaultValue: 'Maputo Center'
+      },
+      role: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "user",
+      },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+      updatedAt: DataTypes.DATE,
+      deletedAt: DataTypes.DATE,
     },
-    role: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "user",
-    },
-    isActive: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
-    },
-    updatedAt: DataTypes.DATE,
-    deletedAt: DataTypes.DATE,
- 
-  
-  },
+    {
+      sequelize,
+      modelName: "User",
+      tableName: "Users",
+    }
+  );
 
-  
-  {
-    sequelize,
-    modelName: "User",
-    tableName: "Users",
-  }
-);
-
-export default User;
+  return User;
+};

@@ -6,7 +6,7 @@ export const phoneSchema = joi.object({
         'string.pattern.base': 'Please provide a valid phone number that starts with + and have 12 digits',
         'string.empty': 'Phone number cannot be empty',
         'any.required': 'Phone number is a required field',
-    
+
     })
 }).unknown();
 
