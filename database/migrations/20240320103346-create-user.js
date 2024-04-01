@@ -19,8 +19,36 @@ module.exports = {
         type: Sequelize.STRING
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
+      gender: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'unspecified'
+      },
+  
+      location: {
+        type: Sequelize.STRING,
+        allowNull:false,
+        defaultValue: 'Maputo Center'
+      },
+      phone: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
+      },
+      role: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "user",
+      },
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -30,7 +58,10 @@ module.exports = {
       },
       deletedAt: {
         type: Sequelize.DATE
-      }
+      },
+  
+
+
     });
   },
   async down(queryInterface, Sequelize) {
