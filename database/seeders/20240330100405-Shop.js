@@ -8,9 +8,8 @@ module.exports = {
       id: '8215a8ea-cf39-4037-81e6-86f6b439dcf4',
       name: 'John Doe',
       location: 'maputo',
-      isOpen: true,
+      isActive: true,
       phone: '+123456789023',
-      shopId: '8215a8ea-cf39-4037-81e6-86f6b439dcf4',
       createdAt: new Date(),
      }], {});
 

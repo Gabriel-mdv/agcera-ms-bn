@@ -1,5 +1,5 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, ForeignKey,CreationOptional } from "sequelize";
-import { Sequelize, sequelize } from ".";
+import { Model, DataTypes, InferAttributes, InferCreationAttributes, ForeignKey,CreationOptional, Sequelize } from "sequelize";
+import {  sequelize } from ".";
 import Shop from "./shop";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
@@ -15,17 +15,10 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare readonly createdAt: Date |null;
   declare updatedAt:  Date | null;
   declare deletedAt: Date | null;
-
-  static associate(models: {Shop: typeof Shop}){
-    User.belongsTo(models.Shop, {
-      foreignKey: 'shopId',
-      as: 'shop'
-    })
-  }
-
+  declare ownerId: ForeignKey<Shop['id']>;
 }
 
-// class User extends Model {}
+User.belongsTo(Shop);
 
 User.init(
   {
@@ -48,7 +41,6 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
       unique: true,
-    
     },
     createdAt: {
       allowNull: false,
@@ -80,7 +72,7 @@ User.init(
       allowNull: false,
       defaultValue: true,
     },
- 
+
     updatedAt: DataTypes.DATE,
     deletedAt: DataTypes.DATE,
 
@@ -91,7 +83,7 @@ User.init(
     modelName: "User",
     tableName: "Users",
   }
-  
+
 );
 
 export default User;

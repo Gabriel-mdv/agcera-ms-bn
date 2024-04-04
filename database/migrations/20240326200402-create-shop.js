@@ -19,15 +19,18 @@ module.exports = {
       phone: {
         type: Sequelize.STRING
       },
-      status: {
-        type: Sequelize.STRING
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
       },
+  
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE
       }
     });
@@ -36,3 +39,5 @@ module.exports = {
     await queryInterface.dropTable('Shops');
   }
 };
+
+

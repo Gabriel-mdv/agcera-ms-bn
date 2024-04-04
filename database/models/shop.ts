@@ -2,25 +2,22 @@ import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOpt
 import { Sequelize, sequelize } from ".";
 import User from "./user";
 
-
 class Shop extends Model<InferAttributes<Shop>, InferCreationAttributes<Shop>> {
   declare id: String |null;
   declare name: String;
   declare phone: String;
   declare location: String ;
-  declare isOpen: Boolean |null;
+  declare isActive: Boolean |null;
   declare readonly createdAt: Date |null;
   declare updatedAt:  Date | null;
   declare deletedAt: Date | null;
-
-  static associate(models: {User: typeof User}) {
-    Shop.hasMany(models.User, {
-      foreignKey: 'shopId',
-      as: 'users'
-    });
-  }
-
 }
+
+Shop.hasMany(sequelize.models.User, {
+  sourceKey: 'id',
+  foreignKey: 'shopId',
+  as: 'users' // this determines the name in `associations`!
+});
 
 Shop.init({
   id: {
@@ -30,11 +27,22 @@ Shop.init({
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
   },
-  name: DataTypes.STRING,
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
   location: DataTypes.STRING,
   phone: DataTypes.STRING,
-  isOpen: DataTypes.STRING,
-  createdAt: DataTypes.DATE,
+  isActive:{
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  createdAt: {
+    allowNull: false,
+    type: DataTypes.DATE,
+    defaultValue: new Date()
+  },
   updatedAt: DataTypes.DATE,
   deletedAt: DataTypes.DATE,
 }, {
@@ -43,10 +51,5 @@ Shop.init({
   tableName: 'shops'
 });
 
-
-Shop.associate({User})
-
-
-  export default Shop;
-
+export default Shop;
 

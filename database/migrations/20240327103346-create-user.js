@@ -27,6 +27,14 @@ module.exports = {
         allowNull: false,
         defaultValue: 'unspecified'
       },
+      shopId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'Shops',
+          key: 'id'
+        }
+      },
   
       location: {
         type: Sequelize.STRING,
