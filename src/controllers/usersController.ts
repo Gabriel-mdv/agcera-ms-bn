@@ -1,12 +1,11 @@
 import { Request, Response} from 'express';
 import bcrypt from 'bcrypt';
-import User from '../../database/models/user';
 import {userRegisterSchema, userLoginSchema, phoneSchema} from '../validation/userSchema';
 import { generateToken, verifyToken } from '../utils/jwtFunctions';
 import { UniqueConstraintError, where } from 'sequelize';
 import sendEmail from '../utils/sendEmail';
 import { decode } from 'punycode';
-
+import User from '@database/models/user';
 
 class UsersController {
 
@@ -44,7 +43,7 @@ class UsersController {
                 return res.status(400).json({
                     status: 'fail',
                     message: 'Failed to create user'
-                
+
                 })
             }
 
@@ -156,7 +155,7 @@ class UsersController {
         try {
             // validate the phone number
             const {error, value} = phoneSchema.validate(req.body);
-           
+
             const phone = value.phone
             console.log(phone)
 
@@ -166,7 +165,7 @@ class UsersController {
                     message:error.message
                 });
             }
-            
+
             // check if the user exists
             const user = await User.findOne({where: {phone}});
             if(!user){
@@ -188,7 +187,7 @@ class UsersController {
             }
 
             // send the token to the user's email
-            const sent_mail = await sendEmail(user.email as string, 'Password Reset', 
+            const sent_mail = await sendEmail(user.email as string, 'Password Reset',
             `Please follow the link to reset the password http://localhost:4000/api/v1/users/reset/${token}`);
 
             if(!sent_mail){
@@ -313,7 +312,7 @@ class UsersController {
             });
         }
     }
-    
+
 }
 
 export default UsersController;

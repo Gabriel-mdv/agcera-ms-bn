@@ -1,5 +1,7 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional } from "sequelize";
-import { Sequelize, sequelize } from ".";
+// import { sequelize } from '@database/models/index';
+import sequelize from "@database/connection";
+import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from "sequelize";
+import Shop from "./shop";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: String |null;
@@ -15,9 +17,8 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare updatedAt:  Date | null;
   declare deletedAt: Date | null;
 
+  declare shopId: ForeignKey<Shop['id']>;
 }
-
-// class User extends Model {}
 
 User.init(
   {
@@ -40,7 +41,7 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
       unique: true,
-    
+
     },
     createdAt: {
       allowNull: false,
@@ -74,16 +75,13 @@ User.init(
     },
     updatedAt: DataTypes.DATE,
     deletedAt: DataTypes.DATE,
- 
-  
   },
-
-  
   {
-    sequelize,
+    sequelize: sequelize,
     modelName: "User",
     tableName: "Users",
   }
-);
+)
 
-export default User;
+
+export default User

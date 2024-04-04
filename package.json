@@ -4,8 +4,12 @@
   "main": "server.ts",
   "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon -r tsconfig-paths/register server.ts",
+    "db:migrate": "sequelize db:migrate",
+    "db:seed": "sequelize db:seed:undo:all && sequelize db:seed:all",
+    "db:rollback": "sequelize db:migrate:undo:all",
+    "build": "tsc && tsc-alias",
+    "start": "npm run db:migrate && npm run db:seed && node build/server.js"
   },
   "author": "Jean Gabriel & Shema Alain",
   "license": "ISC",
@@ -29,14 +33,19 @@
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.7",
     "@types/express": "^4.17.21",
+    "@types/joi": "^17.2.3",
     "@types/jsonwebtoken": "^9.0.6",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^20.11.30",
     "@types/nodemailer": "^6.4.14",
     "@types/uuid": "^9.0.8",
     "morgan": "^1.10.0",
     "sequelize-cli": "^6.6.2",
     "ts-node": "^10.9.2",
+    "tsc": "^2.0.4",
+    "tsc-alias": "^1.8.8",
+    "tsconfig-paths": "^4.2.0",
     "tslib": "^2.6.2",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.3"
   }
 }

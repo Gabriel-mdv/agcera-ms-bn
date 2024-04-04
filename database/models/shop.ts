@@ -1,7 +1,6 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional } from "sequelize";
-import { Sequelize, sequelize } from ".";
+import { Association, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
 import User from "./user";
-
+import sequelize from "@database/connection";
 
 class Shop extends Model<InferAttributes<Shop>, InferCreationAttributes<Shop>> {
   declare id: String |null;
@@ -13,12 +12,9 @@ class Shop extends Model<InferAttributes<Shop>, InferCreationAttributes<Shop>> {
   declare updatedAt:  Date | null;
   declare deletedAt: Date | null;
 
-  static associate(models: {User: typeof User}) {
-    Shop.hasMany(models.User, {
-      foreignKey: 'shopId',
-      as: 'users'
-    });
-  }
+  declare static associations: {
+    users: Association<Model<any, any>, Model<any, any>>;
+  };
 }
 
 Shop.init({
@@ -37,13 +33,14 @@ Shop.init({
   updatedAt: DataTypes.DATE,
   deletedAt: DataTypes.DATE,
 }, {
-  sequelize,
+  sequelize: sequelize,
   modelName: 'Shop',
   tableName: 'shops'
 });
 
+Shop.hasMany(User, {
+  foreignKey: 'shopId',
+  as: 'users',
+})
 
-Shop.associate({User})
-
-
-  export default Shop;
+export default Shop;
