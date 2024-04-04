@@ -1,7 +1,8 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional, Sequelize, Association } from "sequelize";
-import { User } from './user';
+import { Association, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
+import User from "./user";
+import sequelize from "@database/connection";
 
-export class Shop extends Model<InferAttributes<Shop>, InferCreationAttributes<Shop>> {
+class Shop extends Model<InferAttributes<Shop>, InferCreationAttributes<Shop>> {
   declare id: String |null;
   declare name: String;
   declare phone: String;
@@ -16,33 +17,30 @@ export class Shop extends Model<InferAttributes<Shop>, InferCreationAttributes<S
   };
 }
 
-export default (sequelize: Sequelize) => {
+Shop.init({
+  id: {
+    unique: true,
+    allowNull: false,
+    primaryKey: true,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+  },
+  name: DataTypes.STRING,
+  location: DataTypes.STRING,
+  phone: DataTypes.STRING,
+  isOpen: DataTypes.STRING,
+  createdAt: DataTypes.DATE,
+  updatedAt: DataTypes.DATE,
+  deletedAt: DataTypes.DATE,
+}, {
+  sequelize: sequelize,
+  modelName: 'Shop',
+  tableName: 'shops'
+});
 
-  Shop.hasMany(User, {
-    foreignKey: 'shopId',
-    as: 'users',
-  })
+Shop.hasMany(User, {
+  foreignKey: 'shopId',
+  as: 'users',
+})
 
-  Shop.init({
-    id: {
-      unique: true,
-      allowNull: false,
-      primaryKey: true,
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-    },
-    name: DataTypes.STRING,
-    location: DataTypes.STRING,
-    phone: DataTypes.STRING,
-    isOpen: DataTypes.STRING,
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
-    deletedAt: DataTypes.DATE,
-  }, {
-    sequelize,
-    modelName: 'Shop',
-    tableName: 'shops'
-  });
-
-  return Shop;
-}
+export default Shop;

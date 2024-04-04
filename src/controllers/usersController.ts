@@ -5,8 +5,7 @@ import { generateToken, verifyToken } from '../utils/jwtFunctions';
 import { UniqueConstraintError, where } from 'sequelize';
 import sendEmail from '../utils/sendEmail';
 import { decode } from 'punycode';
-import { User } from '@database/models/user';
-
+import User from '@database/models/user';
 
 class UsersController {
 

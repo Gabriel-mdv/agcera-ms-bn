@@ -1,7 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import User from '@database/models/user';
+import { NextFunction, Response } from 'express';
 import { verifyToken } from '../utils/jwtFunctions';
-import  { User } from '@database/models/user';
-import { ParamsDictionary } from 'express-serve-static-core';
 
 const checkRoleMiddleware =  (requiredRole: string) => {
     return  async (req: any, res: Response, next: NextFunction) => {
@@ -11,7 +10,7 @@ const checkRoleMiddleware =  (requiredRole: string) => {
         // Check if the token exists
         if (!token) {
             return res.status(401).json({
-                statu: 'fail',
+                status: 'fail',
                 message: 'Unauthorized. Please Login!' });
         }
 

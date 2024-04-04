@@ -1,7 +1,9 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, Sequelize, ForeignKey } from "sequelize";
-import { Shop } from "./shop";
+// import { sequelize } from '@database/models/index';
+import sequelize from "@database/connection";
+import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from "sequelize";
+import Shop from "./shop";
 
-export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: String |null;
   declare name: String;
   declare password: String;
@@ -18,69 +20,68 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare shopId: ForeignKey<Shop['id']>;
 }
 
-export default (sequelize: Sequelize) => {
-  User.init(
-    {
-      id: {
-        unique: true,
-        allowNull: false,
-        primaryKey: true,
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-      },
-      name:{
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        unique: true,
-
-      },
-      createdAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-      },
-      phone: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      gender: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: 'unspecified'
-      },
-
-      location: {
-        type: DataTypes.STRING,
-        allowNull:false,
-        defaultValue: 'Maputo Center'
-      },
-      role: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: "user",
-      },
-      isActive: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: true,
-      },
-      updatedAt: DataTypes.DATE,
-      deletedAt: DataTypes.DATE,
+User.init(
+  {
+    id: {
+      unique: true,
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
     },
-    {
-      sequelize,
-      modelName: "User",
-      tableName: "Users",
-    }
-  );
+    name:{
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
 
-  return User;
-};
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    gender: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'unspecified'
+    },
+
+    location: {
+      type: DataTypes.STRING,
+      allowNull:false,
+      defaultValue: 'Maputo Center'
+    },
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "user",
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    updatedAt: DataTypes.DATE,
+    deletedAt: DataTypes.DATE,
+  },
+  {
+    sequelize: sequelize,
+    modelName: "User",
+    tableName: "Users",
+  }
+)
+
+
+export default User

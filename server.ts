@@ -1,15 +1,17 @@
-import  Express from 'express';
-import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-import sequelizeConnection from './database/connection';
-import router from './src/routes';
 import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+import Express from 'express';
+import morgan from 'morgan';
+import sequelize from './database/connection';
+import router from './src/routes';
 
 
 const app = Express();
 
 
 // all app configuration
+app.use(morgan('dev'));
 dotenv.config();
 app.use(bodyParser.json())
 app.use(cookieParser());
@@ -21,7 +23,7 @@ app.get('/', (req, res) => {
 })
 app.use('/api/v1', router);
 
-sequelizeConnection.authenticate().then(() => {
+sequelize.authenticate().then(() => {
     console.log('database connected successfully');
     app.listen(PORT, () => {
         console.log(`server is running on port ${PORT}`);
