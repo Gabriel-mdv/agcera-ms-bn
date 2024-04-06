@@ -30,7 +30,30 @@ export const userRegisterSchema = joi.object({
         'string.pattern.base': 'Please provide a valid phone number that starts with + and have 12 digits',
         'string.empty': 'Phone number cannot be empty',
         'any.required': 'Phone number is a required field',
-    })
+    }),
+    storeId: joi.string().required(),
+}).unknown();
+
+
+// make the same sehcma for updating a user but the fields are not required
+export const userUpdateSchema = joi.object({
+    name: joi.string().pattern(/^[a-zA-Z]+\s+[a-zA-Z]+/).messages({
+        'string.pattern.base': 'Provide at least two names',
+        'string.empty': 'Name cannot be empty',
+        'any.required': 'Name is a required field',
+    }),
+    email: joi.string().pattern(new RegExp('^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$'))
+        .messages({
+            'string.pattern.base': 'Please provide a valid Email',
+            'string.empty': 'Email cannot be empty',
+        }),
+    phone: joi.string().pattern(/^\+\d{12}$/)
+    .messages({
+        'string.pattern.base': 'Please provide a valid phone number that starts with + and have 12 digits',
+        'string.empty': 'Phone number cannot be empty',
+        'any.required': 'Phone number is a required field',
+    }),
+    storeId: joi.string(),
 }).unknown();
 
 // the schema for login
