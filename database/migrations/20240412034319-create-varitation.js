@@ -2,18 +2,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Variations', {
+    await queryInterface.createTable('Varitations', {
       id: {
-        unique: true,
         allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
+        type: Sequelize.INTEGER
       },
       name: {
-        type: Sequelize.STRING
-      },
-      description: {
         type: Sequelize.STRING
       },
       costPrice: {
@@ -22,28 +18,17 @@ module.exports = {
       sellingPrice: {
         type: Sequelize.DECIMAL
       },
-      productId: {
-        type: Sequelize.UUID,
-        references: {
-          model: 'Products',
-          key: 'id'
-        }
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: true,
-        type: Sequelize.DATE
-      },
-      deletedAt: {
-        allowNull: true,
+        allowNull: false,
         type: Sequelize.DATE
       }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Variations');
-  }   
+    await queryInterface.dropTable('Varitations');
+  }
 };

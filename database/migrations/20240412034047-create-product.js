@@ -4,11 +4,10 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Products', {
       id: {
-        unique: true,
         allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
+        type: Sequelize.INTEGER
       },
       name: {
         type: Sequelize.STRING
@@ -19,7 +18,7 @@ module.exports = {
       price: {
         type: Sequelize.DECIMAL
       },
-      qt_in_stock: {
+      quantity: {
         type: Sequelize.INTEGER
       },
       type: {
@@ -39,11 +38,7 @@ module.exports = {
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: true,
-        type: Sequelize.DATE
-      },
-      deletedAt: {
-        allowNull: true,
+        allowNull: false,
         type: Sequelize.DATE
       }
     });
