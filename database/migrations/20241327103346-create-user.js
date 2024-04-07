@@ -43,6 +43,14 @@ module.exports = {
         allowNull: false,
         defaultValue: "user",
       },
+      storeId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'Stores',
+          key: 'id'
+        }
+      },
       isActive: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

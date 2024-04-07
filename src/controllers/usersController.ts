@@ -1,11 +1,12 @@
 import { Request, Response} from 'express';
 import bcrypt from 'bcrypt';
-import {userRegisterSchema, userLoginSchema, phoneSchema} from '../validation/userSchema';
+import {userRegisterSchema, userLoginSchema, phoneSchema, userUpdateSchema} from '../validation/user.validation';
 import { generateToken, verifyToken } from '../utils/jwtFunctions';
-import { UniqueConstraintError, where } from 'sequelize';
+import { UniqueConstraintError } from 'sequelize';
 import sendEmail from '../utils/sendEmail';
 import { decode } from 'punycode';
 import User from '@database/models/user';
+import userService from '../services/user.services';
 
 class UsersController {
 
@@ -22,22 +23,14 @@ class UsersController {
                 });
             }
 
-            const {name , email, phone, password} = value;
+            const {name , email, phone, password, storeId} = value;
             const {gender, location, role} = req.body;
 
             // hash the password
             const hashedPassword = await bcrypt.hash(password, bcrypt.genSaltSync(10))
 
             // check if the user already exists
-            const newUser = await User.create({
-                name,
-                email,
-                password: hashedPassword,
-                phone,
-                gender,
-                location,
-                role
-            });
+            const newUser = await userService.registerUser(name, hashedPassword, email, phone,gender, location, storeId, role);
 
             if(!newUser) {
                 return res.status(400).json({
@@ -64,7 +57,14 @@ class UsersController {
                     status: 'fail',
                     message: 'User already exists'
                 });
-            }else{
+                }
+             else if(e.name === 'SequelizeForeignKeyConstraintError') {
+                    return res.status(400).json({
+                        status: 'fail',
+                        message: 'Invalid storeId. No Store found with the provided storeId.'
+                    });
+             }
+            else{
             return res.status(500).json({
                 status: 'fail',
                 message: e.message
@@ -90,7 +90,8 @@ class UsersController {
             const {phone, password} = value;
 
             // check if the user exists and login the user
-            const user = await User.findOne({where: {phone}});
+            const user = await userService.loginUser(phone);
+
             if(!user){
                 return res.status(404).json({
                     status: 'fail',
@@ -150,6 +151,7 @@ class UsersController {
         }
     }
 
+
     // forgot password
     static async ForgotPasword(req: Request, res: Response): Promise<Response | undefined> {
         try {
@@ -157,7 +159,6 @@ class UsersController {
             const {error, value} = phoneSchema.validate(req.body);
 
             const phone = value.phone
-            console.log(phone)
 
             if (error) {
                 return res.status(400).json({
@@ -167,7 +168,7 @@ class UsersController {
             }
 
             // check if the user exists
-            const user = await User.findOne({where: {phone}});
+            const user = await userService.loginUser(phone);
             if(!user){
                 return res.status(404).json({
                     status: 'fail',
@@ -226,10 +227,10 @@ class UsersController {
                 });
             }
 
-            const {id} = decoded_token as {[key: string]: object};
+            const {id} = decoded_token as {[key: string]: any};
 
             // get the user using the id
-            const user = await User.findOne({ where: {id} });
+            const user = await userService.getUserById(id);
 
             console.log(user)
 
@@ -271,7 +272,7 @@ class UsersController {
     // get all users
     static async getAllUsers(req: Request, res: Response): Promise<Response | undefined> {
         try {
-            const users = await User.findAll();
+            const users = await userService.getAllUsers();
 
             return res.status(200).json({
                 status: 'success',
@@ -291,7 +292,7 @@ class UsersController {
         try {
             const {id} = req.params;
 
-            const user = await User.findOne({where: {id}});
+            const user = await userService.getUserById(id);
 
             if(!user){
                 return res.status(404).json({
@@ -313,6 +314,53 @@ class UsersController {
         }
     }
 
+    // update user profile
+    static async updateUser(req: Request, res: Response): Promise<Response | undefined> {
+        try {
+            const {id} = req.params;
+            
+            const user = await userService.getUserById(id);
+            if(!user){
+                return res.status(404).json({
+                    status: 'fail',
+                    message: 'User not found'
+                });
+            }
+
+            // update the user
+            const {error, value} = userUpdateSchema.validate(req.body);     
+            if(error){
+                return res.status(400).json({
+                    status: 'fail',
+                    message: error.message
+                });
+            }
+
+            const {name, email, phone, storeId} = value;
+
+            name ? user.name = name : null;
+            email ? user.email = email : null;
+            phone ? user.phone = phone : null;
+            storeId ? user.storeId = storeId : null;
+
+            await user.save();
+
+            delete (user.dataValues as {[key: string]: any}).password;
+
+            return res.status(200).json({
+                status: 'success',
+                data: user
+            });
+
+        }
+        catch(e: any){
+            return res.status(500).json({
+                status: 'fail',
+                message: e.message
+            });
+        }
+    }
 }
+
 
 export default UsersController;

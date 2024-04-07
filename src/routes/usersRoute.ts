@@ -11,5 +11,6 @@ router.post('/forgot', usersController.ForgotPasword);
 router.get('/logout', usersController.Logout);
 router.get('/all', isAdmin, usersController.getAllUsers);
 router.put('/reset/:token', usersController.resetPassword);
+router.patch('/update', isAdmin, usersController.updateUser);
 
 export default router;

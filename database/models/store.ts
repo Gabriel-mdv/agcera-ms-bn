@@ -2,7 +2,7 @@ import { Association, DataTypes, InferAttributes, InferCreationAttributes, Model
 import User from "./user";
 import sequelize from "@database/connection";
 
-class Shop extends Model<InferAttributes<Shop>, InferCreationAttributes<Shop>> {
+class Store extends Model<InferAttributes<Store>, InferCreationAttributes<Store>> {
   declare id: String |null;
   declare name: String;
   declare phone: String;
@@ -11,19 +11,18 @@ class Shop extends Model<InferAttributes<Shop>, InferCreationAttributes<Shop>> {
   declare readonly createdAt: Date |null;
   declare updatedAt:  Date | null;
   declare deletedAt: Date | null;
-
   declare static associations: {
     users: Association<Model<any, any>, Model<any, any>>;
-  };
+  }
 }
 
-Shop.init({
+Store.init({
   id: {
     unique: true,
     allowNull: false,
     primaryKey: true,
     type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
+    defaultValue: DataTypes.UUIDV4
   },
   name: DataTypes.STRING,
   location: DataTypes.STRING,
@@ -34,13 +33,15 @@ Shop.init({
   deletedAt: DataTypes.DATE,
 }, {
   sequelize: sequelize,
-  modelName: 'Shop',
-  tableName: 'shops'
+  modelName: 'Store',
+  tableName: 'Stores'
 });
 
-Shop.hasMany(User, {
-  foreignKey: 'shopId',
+Store.hasMany(User, {
+  foreignKey: 'storeId',
   as: 'users',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
 })
 
-export default Shop;
+export default Store;
