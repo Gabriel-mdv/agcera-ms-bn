@@ -9,7 +9,8 @@
     "db:seed": "sequelize db:seed:undo:all && sequelize db:seed:all",
     "db:rollback": "sequelize db:migrate:undo:all",
     "build": "tsc && tsc-alias",
-    "start": "npm run db:migrate && npm run db:seed && node build/server.js"
+    "start": "npm run db:migrate && npm run db:seed && node build/server.js",
+    "build:docker": "make build"
   },
   "author": "Jean Gabriel & Shema Alain",
   "license": "ISC",
