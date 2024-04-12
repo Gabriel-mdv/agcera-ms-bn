@@ -54,6 +54,6 @@ class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Pr
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   })
-  
-  
+
+
   export default Product;

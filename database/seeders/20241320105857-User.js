@@ -1,9 +1,8 @@
-
-// const { v4: uuidv4 } = require('uuid')
+// Const { v4: uuidv4 } = require('uuid')
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up (queryInterface) {
     await queryInterface.bulkInsert('Users', [{
       id: '8215a8ea-cf39-4037-81e6-86f6b439dcf4',
       name: 'Rukudno Venuste',
@@ -12,10 +11,10 @@ module.exports = {
       storeId: '123e4567-e89b-12d3-a456-426614174000',
       phone: '+123456789023',
       createdAt: new Date(),
-    }], {}); 
+    }], {});
   },
 
-  async down (queryInterface, Sequelize) {
+  async down (queryInterface) {
     await queryInterface.bulkDelete('Users', null, {});
   }
 };

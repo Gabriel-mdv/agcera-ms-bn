@@ -1,4 +1,3 @@
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -12,36 +11,36 @@ module.exports = {
       },
       name: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       password: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       email: {
         type: Sequelize.STRING,
-        unique: true
+        unique: true,
       },
       gender: {
         type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: 'unspecified'
+        defaultValue: 'unspecified',
       },
-  
+
       location: {
         type: Sequelize.STRING,
-        allowNull:false,
-        defaultValue: 'Maputo Center'
+        allowNull: false,
+        defaultValue: 'Maputo Center',
       },
       phone: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true
+        unique: true,
       },
       role: {
         type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: "user",
+        defaultValue: 'user',
       },
       storeId: {
         type: Sequelize.UUID,
@@ -59,20 +58,17 @@ module.exports = {
 
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       deletedAt: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
-  
-
-
-    });
+    })
   },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users', null, {});
-  }
-};
+  async down(queryInterface, _) {
+    await queryInterface.dropTable('Users')
+  },
+}

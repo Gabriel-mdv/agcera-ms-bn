@@ -3,16 +3,21 @@ import sequelize from "@database/connection";
 import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from "sequelize";
 import Store from "./store";
 
+export enum ClientType {
+  USER = 'USER',
+  CLIENT = 'CLIENT',
+}
+
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-  declare id: String |null;
-  declare name: String;
-  declare password: String;
-  declare email: String | null;
-  declare phone: String;
-  declare gender: String |null;
-  declare location: String ;
-  declare role: String;
-  declare isActive: Boolean |null;
+  declare id: string |null;
+  declare name: string;
+  declare password: string;
+  declare email: string | null;
+  declare phone: string;
+  declare gender: string |null;
+  declare location: string ;
+  declare role: string;
+  declare isActive: boolean |null;
   declare readonly createdAt: Date |null;
   declare updatedAt:  Date | null;
   declare deletedAt: Date | null;
@@ -28,9 +33,9 @@ User.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
     },
-    name:{
+    name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
@@ -40,7 +45,6 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
       unique: true,
-
     },
     createdAt: {
       allowNull: false,
@@ -54,18 +58,18 @@ User.init(
     gender: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: 'unspecified'
+      defaultValue: 'unspecified',
     },
 
     location: {
       type: DataTypes.STRING,
-      allowNull:false,
-      defaultValue: 'Maputo Center'
+      allowNull: false,
+      defaultValue: 'Maputo Center',
     },
     role: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: "user",
+      defaultValue: 'user',
     },
     storeId:{
       type: DataTypes.UUID,
@@ -80,13 +84,10 @@ User.init(
     deletedAt: DataTypes.DATE,
   },
   {
-    sequelize: sequelize,
-    modelName: "User",
-    tableName: "Users",
+    sequelize,
+    modelName: 'User',
+    tableName: 'Users',
   }
 )
-
-
-
 
 export default User

@@ -1,13 +1,13 @@
-import { Association, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
-import User from "./user";
-import sequelize from "@database/connection";
+import { type Association, DataTypes, type InferAttributes, type InferCreationAttributes, Model } from 'sequelize'
+import User from './user'
+import sequelize from '@database/connection'
 
 class Store extends Model<InferAttributes<Store>, InferCreationAttributes<Store>> {
-  declare id: String |null;
-  declare name: String;
-  declare phone: String;
-  declare location: String ;
-  declare isOpen: Boolean |null;
+  declare id: string |null;
+  declare name: string;
+  declare phone: string;
+  declare location: string ;
+  declare isOpen: boolean |null;
   declare readonly createdAt: Date |null;
   declare updatedAt:  Date | null;
   declare deletedAt: Date | null;
