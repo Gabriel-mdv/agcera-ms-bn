@@ -6,26 +6,26 @@ module.exports = {
       id: {
         unique: true,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
       },
-      name: {
-        type: Sequelize.STRING,
-      },
-      costPrice: {
-        type: Sequelize.DECIMAL,
-      },
-      sellingPrice: {
-        type: Sequelize.DECIMAL,
-      },
+      name: Sequelize.STRING,
+      description: Sequelize.STRING,
+      costPrice: Sequelize.DECIMAL,
+      sellingPrice: Sequelize.DECIMAL,
+      productId: Sequelize.UUID,
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: new Date(),
       },
       updatedAt: {
-        allowNull: false,
+        allowNull: true,
+        type: Sequelize.DATE,
+      },
+      deletedAt: {
+        allowNull: true,
         type: Sequelize.DATE,
       },
     })

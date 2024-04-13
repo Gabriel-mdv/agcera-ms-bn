@@ -1,11 +1,11 @@
 import sequelize from '@database/connection'
 import {
   DataTypes,
-  Model,
   NonAttribute,
   type Association,
   type InferAttributes,
   type InferCreationAttributes,
+  Model,
 } from 'sequelize'
 import StoreProduct from './storeproduct'
 import User from './user'
@@ -68,6 +68,7 @@ Store.init(
     sequelize: sequelize,
     modelName: 'Store',
     tableName: 'Stores',
+    paranoid: true,
   }
 )
 
@@ -77,5 +78,6 @@ Store.hasMany(User, {
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 })
+User.belongsTo(Store, { foreignKey: 'storeId', as: 'store' })
 
 export default Store

@@ -11,7 +11,7 @@ module.exports = {
           name: 'main store',
           location: 'Maputo 12',
           phone: '+258840000000',
-          isOpen: false,
+          isActive: false,
           createdAt: new Date(),
         },
         {
@@ -19,7 +19,7 @@ module.exports = {
           name: 'Store 2',
           location: 'Maputo 13',
           phone: '+258840000001',
-          isOpen: true,
+          isActive: true,
           createdAt: new Date(),
         },
         {
@@ -27,7 +27,7 @@ module.exports = {
           name: 'Store 3',
           location: 'Maputo 14',
           phone: '+258840000002',
-          isOpen: true,
+          isActive: true,
           createdAt: new Date(),
         },
       ],

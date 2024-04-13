@@ -1,7 +1,14 @@
 // import { sequelize } from '@database/models/index';
 import sequelize from '@database/connection'
 import { UserGendersEnum, UserRolesEnum } from '@src/types/user.types'
-import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from 'sequelize'
+import {
+  // Association,
+  DataTypes,
+  ForeignKey,
+  type InferAttributes,
+  type InferCreationAttributes,
+  Model,
+} from 'sequelize'
 import Store from './store'
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
@@ -92,9 +99,10 @@ User.init(
     deletedAt: DataTypes.DATE,
   },
   {
-    sequelize,
+    sequelize: sequelize,
     modelName: 'User',
     tableName: 'Users',
+    paranoid: true,
   }
 )
 
