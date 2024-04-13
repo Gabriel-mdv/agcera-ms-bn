@@ -68,7 +68,7 @@ module.exports = {
       },
     })
   },
-  async down(queryInterface, _) {
+  async down(queryInterface) {
     await queryInterface.dropTable('Users')
   },
 }

@@ -44,7 +44,7 @@ Varitation.init(
   },
   {
     sequelize,
-    modelName: 'Varitation',
+    modelName: 'Variation',
     tableName: 'Variations',
   }
 )
