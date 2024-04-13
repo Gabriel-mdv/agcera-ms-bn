@@ -17,7 +17,7 @@ module.exports = {
           saleId: '7ffdcde2-a8dc-427f-bac2-863f52401fc0',
           productId: '123e4567-e89b-12d3-a456-426614174002',
           createdAt: new Date(),
-        }
+        },
       ],
       {}
     )

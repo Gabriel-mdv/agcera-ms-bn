@@ -1,28 +1,27 @@
-import { Association, DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from "sequelize";
-import User from "./user";
-import sequelize from "@database/connection";
-import Product from "./product";
+import sequelize from '@database/connection'
+import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from 'sequelize'
+import Product from './product'
 
 class Varitation extends Model<InferAttributes<Varitation>, InferCreationAttributes<Varitation>> {
-  declare id: String |null;
-  declare name: String;
-  declare description: String | null;
-  declare costPrice: Number;
-  declare sellingPrice: Number;
-  declare readonly createdAt: Date;
-  declare updatedAt:  Date | null;
-  declare deletedAt: Date | null;
-  declare productId: ForeignKey<Product['id']>;
-  
+  declare id: string | null
+  declare name: string
+  declare description: string | null
+  declare costPrice: number
+  declare sellingPrice: number
+  declare readonly createdAt: Date
+  declare updatedAt: Date | null
+  declare deletedAt: Date | null
+  declare productId: ForeignKey<Product['id']>
 }
 
-  Varitation.init({
+Varitation.init(
+  {
     id: {
       unique: true,
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
+      defaultValue: DataTypes.UUIDV4,
     },
     name: DataTypes.STRING,
     description: DataTypes.STRING,
@@ -32,7 +31,7 @@ class Varitation extends Model<InferAttributes<Varitation>, InferCreationAttribu
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      defaultValue: new Date()
+      defaultValue: new Date(),
     },
     updatedAt: {
       allowNull: true,
@@ -42,11 +41,12 @@ class Varitation extends Model<InferAttributes<Varitation>, InferCreationAttribu
       allowNull: true,
       type: DataTypes.DATE,
     },
-  }, {
+  },
+  {
     sequelize,
     modelName: 'Varitation',
-    tableName: 'Variations'
-  });
+    tableName: 'Variations',
+  }
+)
 
-
-  export default Varitation;
+export default Varitation

@@ -1,27 +1,44 @@
-'use strict';
-const { v4: uuidv4 } = require('uuid');
+'use strict'
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
-
-      await queryInterface.bulkInsert('Products', [{
-      id: 'ba86b8f0-6fdf-4944-87a0-8a491a19490e',
-       name: 'Cera Meister',
-       description: 'Cera Meister',
-        price: 1000,
-        qt_in_stock: 10,
-        type: 'normal',
-        costPrice: 500,
-        sellingPrice: 1000,
-        storeId: '123e4567-e89b-12d3-a456-426614174000',
-        createdAt: new Date(),
-     }], {});
-
+  async up(queryInterface) {
+    await queryInterface.bulkInsert(
+      'Products',
+      [
+        {
+          id: '123e4567-e89b-12d3-a456-426614174001',
+          name: 'Product 1',
+          description: 'Description 1',
+          type: 'NORMAL',
+          costPrice: 10.0,
+          sellingPrice: 15.0,
+          createdAt: new Date(),
+        },
+        {
+          id: '123e4567-e89b-12d3-a456-426614174002',
+          name: 'Product 2',
+          description: 'Description 2',
+          type: 'NORMAL',
+          costPrice: 20.0,
+          sellingPrice: 25.0,
+          createdAt: new Date(),
+        },
+        {
+          id: '123e4567-e89b-12d3-a456-426614174003',
+          name: 'Product 3',
+          description: 'Description 3',
+          type: 'NORMAL',
+          costPrice: 30.0,
+          sellingPrice: 35.0,
+          createdAt: new Date(),
+        },
+      ],
+      {}
+    )
   },
 
-  async down (queryInterface, Sequelize) {
-    
-    await queryInterface.bulkDelete('Products', null, {});
-
-  }
-};
+  async down(queryInterface) {
+    await queryInterface.bulkDelete('Products', null, {})
+  },
+}

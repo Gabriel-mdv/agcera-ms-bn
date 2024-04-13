@@ -11,7 +11,7 @@ module.exports = {
           clientType: 'USER',
           storeId: '143e4667-a81d-12d3-c356-469311174302',
           createdAt: new Date(),
-        }
+        },
       ],
       {}
     )

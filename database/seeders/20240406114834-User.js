@@ -46,7 +46,7 @@ module.exports = {
           phone: '+123456789026',
           role: 'user',
           createdAt: new Date(),
-        }
+        },
       ],
       {}
     )
