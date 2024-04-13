@@ -1,4 +1,5 @@
 // Const { v4: uuidv4 } = require('uuid')
+const { UserRolesEnum } = require('@src/types/user.types')
 const bcrypt = require('bcrypt')
 
 /** @type {import('sequelize-cli').Migration} */
@@ -14,7 +15,7 @@ module.exports = {
           password: bcrypt.hashSync('1234', bcrypt.genSaltSync(10)),
           storeId: '143e4667-a81d-12d3-c356-469311174300',
           phone: '+123456789023',
-          role: 'admin',
+          role: UserRolesEnum.ADMIN,
           createdAt: new Date(),
         },
         {
@@ -24,7 +25,7 @@ module.exports = {
           password: bcrypt.hashSync('1234', bcrypt.genSaltSync(10)),
           storeId: '143e4667-a81d-12d3-c356-469311174301',
           phone: '+123456789024',
-          role: 'keeper',
+          role:  UserRolesEnum.KEEPER,
           createdAt: new Date(),
         },
         {
@@ -34,7 +35,7 @@ module.exports = {
           password: bcrypt.hashSync('1234', bcrypt.genSaltSync(10)),
           storeId: '143e4667-a81d-12d3-c356-469311174301',
           phone: '+123456789025',
-          role: 'keeper',
+          role: UserRolesEnum.KEEPER,
           createdAt: new Date(),
         },
         {
@@ -44,7 +45,7 @@ module.exports = {
           password: bcrypt.hashSync('1234', bcrypt.genSaltSync(10)),
           storeId: '143e4667-a81d-12d3-c356-469311174301',
           phone: '+123456789026',
-          role: 'user',
+          role: UserRolesEnum.USER,
           createdAt: new Date(),
         },
       ],

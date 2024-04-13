@@ -1,6 +1,6 @@
 import { PaymentMethodsEnum } from '@database/models/sale'
-import { ClientTypesEnum } from '@database/models/user'
 import { SortDirectionEnum } from './common.types'
+import { ClientTypesEnum } from './user.types'
 
 export interface CreateSaleRequestProducts {
   [key: string]: number

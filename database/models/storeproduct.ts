@@ -18,6 +18,7 @@ class StoreProduct extends Model<InferAttributes<StoreProduct>, InferCreationAtt
 StoreProduct.init(
   {
     id: {
+      unique: true,
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
@@ -49,6 +50,7 @@ StoreProduct.init(
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
+      defaultValue: new Date(),
     },
     updatedAt: DataTypes.DATE,
     deletedAt: DataTypes.DATE,

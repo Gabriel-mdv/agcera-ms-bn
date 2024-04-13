@@ -1,5 +1,5 @@
 import { PaymentMethodsEnum } from '@database/models/sale'
-import { ClientTypesEnum } from '@database/models/user'
+import { ClientTypesEnum } from '@src/types/user.types'
 import Joi from 'joi'
 
 const paymentMethodValues = Object.values(PaymentMethodsEnum)

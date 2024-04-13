@@ -1,7 +1,7 @@
-import { ClientTypesEnum } from '@database/models/user'
 import SalesServices from '@src/services/sales.services'
 import { RequestWithUser } from '@src/types/common.types'
 import { GetAllSalesRequestQuery } from '@src/types/sales.types'
+import { ClientTypesEnum } from '@src/types/user.types'
 import { formatSortQuery } from '@src/utils/formatters'
 import { type Response } from 'express'
 import { IncludeOptions, WhereOptions } from 'sequelize'

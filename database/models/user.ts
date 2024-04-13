@@ -1,27 +1,25 @@
 // import { sequelize } from '@database/models/index';
 import sequelize from '@database/connection'
+import { UserGendersEnum, UserRolesEnum } from '@src/types/user.types'
 import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from 'sequelize'
 import Store from './store'
-
-export enum ClientTypesEnum {
-  USER = 'USER',
-  CLIENT = 'CLIENT',
-}
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: string | null
   declare name: string
   declare password: string
-  declare email: string | null
   declare phone: string
-  declare gender: string | null
   declare location: string
-  declare role: string
+  declare role: UserRolesEnum
+  declare email: string | null
+  declare gender: string | null
   declare isActive: boolean | null
+
+  declare storeId: ForeignKey<Store['id']>
+
   declare readonly createdAt: Date | null
   declare updatedAt: Date | null
   declare deletedAt: Date | null
-  declare storeId: ForeignKey<Store['id']>
 }
 
 User.init(
@@ -40,15 +38,17 @@ User.init(
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        min: 4,
+      },
     },
     email: {
       type: DataTypes.STRING,
       allowNull: true,
       unique: true,
-    },
-    createdAt: {
-      allowNull: false,
-      type: DataTypes.DATE,
+      validate: {
+        isEmail: true,
+      },
     },
     phone: {
       type: DataTypes.STRING,
@@ -56,9 +56,9 @@ User.init(
       unique: true,
     },
     gender: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM(...Object.values(UserGendersEnum)),
       allowNull: false,
-      defaultValue: 'unspecified',
+      defaultValue: UserGendersEnum.UNSPECIFIED,
     },
     location: {
       type: DataTypes.STRING,
@@ -66,18 +66,27 @@ User.init(
       defaultValue: 'Maputo Center',
     },
     role: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM(...Object.values(UserRolesEnum)),
       allowNull: false,
-      defaultValue: 'user',
+      defaultValue: UserRolesEnum.USER,
     },
     storeId: {
       type: DataTypes.UUID,
       allowNull: false,
+      references: {
+        model: 'Stores',
+        key: 'id',
+      },
     },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true,
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: new Date(),
     },
     updatedAt: DataTypes.DATE,
     deletedAt: DataTypes.DATE,

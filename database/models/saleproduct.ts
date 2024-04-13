@@ -18,6 +18,7 @@ class SaleProduct extends Model<InferAttributes<SaleProduct>, InferCreationAttri
 SaleProduct.init(
   {
     id: {
+      unique: true,
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
@@ -46,6 +47,7 @@ SaleProduct.init(
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
+      defaultValue: new Date(),
     },
     updatedAt: DataTypes.DATE,
     deletedAt: DataTypes.DATE,

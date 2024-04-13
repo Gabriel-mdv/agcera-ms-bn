@@ -1,27 +1,27 @@
+import sequelize from '@database/connection'
 import {
-  type Association,
   DataTypes,
-  type InferAttributes,
-  type InferCreationAttributes,
   Model,
   NonAttribute,
+  type Association,
+  type InferAttributes,
+  type InferCreationAttributes,
 } from 'sequelize'
-import User from './user'
-import sequelize from '@database/connection'
 import StoreProduct from './storeproduct'
+import User from './user'
 
 class Store extends Model<InferAttributes<Store>, InferCreationAttributes<Store>> {
   declare id: string | null
   declare name: string
   declare phone: string
   declare location: string
-  declare isOpen: boolean | null
+  declare isActive: boolean | null
   declare readonly createdAt: Date | null
   declare updatedAt: Date | null
   declare deletedAt: Date | null
 
-  declare products?: NonAttribute<StoreProduct[]>
   declare users?: NonAttribute<User[]>
+  declare products?: NonAttribute<StoreProduct[]>
 
   declare static associations: {
     users: Association<User, Store>
@@ -37,11 +37,30 @@ Store.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
     },
-    name: DataTypes.STRING,
-    location: DataTypes.STRING,
-    phone: DataTypes.STRING,
-    isOpen: DataTypes.STRING,
-    createdAt: DataTypes.DATE,
+    name: {
+      unique: true,
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    phone: {
+      unique: true,
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+      allowNull: false,
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: new Date(),
+    },
     updatedAt: DataTypes.DATE,
     deletedAt: DataTypes.DATE,
   },

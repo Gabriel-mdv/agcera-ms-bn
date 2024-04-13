@@ -7,8 +7,9 @@ import {
   Model,
   NonAttribute,
 } from 'sequelize'
-import User, { ClientTypesEnum } from './user'
+import User from './user'
 import Store from './store'
+import { ClientTypesEnum } from '@src/types/user.types'
 
 export enum PaymentMethodsEnum {
   CASH = 'CASH',
@@ -36,6 +37,7 @@ class Sale extends Model<InferAttributes<Sale>, InferCreationAttributes<Sale>> {
 Sale.init(
   {
     id: {
+      unique: true,
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
@@ -70,6 +72,7 @@ Sale.init(
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
+      defaultValue: new Date(),
     },
     updatedAt: DataTypes.DATE,
     deletedAt: DataTypes.DATE,

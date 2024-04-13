@@ -4,6 +4,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('SaleProducts', {
       id: {
+        unique: true,
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
@@ -32,6 +33,7 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: new Date(),
       },
       updatedAt: Sequelize.DATE,
       deletedAt: Sequelize.DATE,

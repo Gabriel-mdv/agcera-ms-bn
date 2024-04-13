@@ -1,18 +1,23 @@
-import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from 'sequelize'
+import { Association, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from 'sequelize'
 import Store from './user'
 import Varitation from './varitation'
 import sequelize from '@database/connection'
+import { ProductTypesEnum } from '@src/types/product.types'
 
 class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Product>> {
   declare id: string | null
   declare name: string
   declare description: string | null
-  declare price: number
-  declare qt_in_stock: number
-  declare type: string
-  declare costPrice: number
-  declare sellingPrice: number
-  declare storeId: ForeignKey<Store['id']> | null
+  declare type: ProductTypesEnum
+
+  declare variations?: NonAttribute<Varitation[]>
+  declare stores?: NonAttribute<Store[]>
+
+  declare static associations: {
+    variations: Association<Varitation, Product>
+    stores: Association<Product, Store>
+  }
+
   declare readonly createdAt: Date
   declare updatedAt: Date | null
   declare deletedAt: Date | null
@@ -27,14 +32,17 @@ Product.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
     },
-    name: DataTypes.STRING,
+    name: {
+      unique: true,
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    type: {
+      type: DataTypes.ENUM(...Object.values(ProductTypesEnum)),
+      allowNull: false,
+      defaultValue: ProductTypesEnum.STANDARD,
+    },
     description: DataTypes.STRING,
-    price: DataTypes.DECIMAL,
-    qt_in_stock: DataTypes.INTEGER,
-    type: DataTypes.STRING,
-    costPrice: DataTypes.DECIMAL,
-    sellingPrice: DataTypes.DECIMAL,
-    storeId: DataTypes.STRING,
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
