@@ -1,7 +1,7 @@
 // import { sequelize } from '@database/models/index';
 import sequelize from "@database/connection";
 import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from "sequelize";
-import Shop from "./shop";
+import Store from "./store";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: String |null;
@@ -16,8 +16,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare readonly createdAt: Date |null;
   declare updatedAt:  Date | null;
   declare deletedAt: Date | null;
-
-  declare shopId: ForeignKey<Shop['id']>;
+  declare storeId: ForeignKey<Store['id']>;
 }
 
 User.init(
@@ -68,6 +67,10 @@ User.init(
       allowNull: false,
       defaultValue: "user",
     },
+    storeId:{
+      type: DataTypes.UUID,
+      allowNull: false,
+      },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -82,6 +85,8 @@ User.init(
     tableName: "Users",
   }
 )
+
+
 
 
 export default User
