@@ -1,38 +1,31 @@
 'use strict'
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Sales', {
+    await queryInterface.createTable('SaleProducts', {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
-      paymentMethod: {
+      quantity: {
         allowNull: false,
-        type: Sequelize.ENUM('CASH', 'MOMO'),
-        defaultValue: 'MOMO',
+        type: Sequelize.DOUBLE,
       },
-      clientId: {
+      saleId: {
         allowNull: false,
         type: Sequelize.UUID,
         references: {
-          model: 'Users',
+          model: 'Sales',
           key: 'id',
         },
       },
-      clientType: {
-        allowNull: false,
-        type: Sequelize.ENUM('USER', 'CLIENT'),
-        defaultValue: 'USER',
-      },
-      shopId: {
+      productId: {
         allowNull: false,
         type: Sequelize.UUID,
         references: {
-          model: 'Shops',
+          model: 'Products',
           key: 'id',
         },
       },
@@ -44,7 +37,7 @@ module.exports = {
       deletedAt: Sequelize.DATE,
     })
   },
-  async down(queryInterface, _) {
-    await queryInterface.dropTable('Sales')
+  async down(queryInterface) {
+    await queryInterface.dropTable('SaleProducts')
   },
 }

@@ -4,14 +4,14 @@ import sequelize from "@database/connection";
 import Varitation from "./varitation";
 
 class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Product>> {
-  declare id: String |null;
-  declare name: String;
-  declare description: String | null;
-  declare price: Number;
-  declare qt_in_stock: Number;
-  declare type: String;
-  declare costPrice: Number;
-  declare sellingPrice: Number;
+  declare id: string |null;
+  declare name: string;
+  declare description: string | null;
+  declare price: number;
+  declare qt_in_stock: number;
+  declare type: string;
+  declare costPrice: number;
+  declare sellingPrice: number;
   declare storeId: ForeignKey<Store['id']> | null;
   declare readonly createdAt: Date;
   declare updatedAt:  Date | null;

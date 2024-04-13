@@ -47,8 +47,8 @@ module.exports = {
         allowNull: true,
         references: {
           model: 'Stores',
-          key: 'id'
-        }
+          key: 'id',
+        },
       },
       isActive: {
         type: Sequelize.BOOLEAN,

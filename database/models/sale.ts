@@ -1,10 +1,16 @@
 import sequelize from '@database/connection'
-import { DataTypes, type ForeignKey, type InferAttributes, type InferCreationAttributes, Model } from 'sequelize'
-import { ClientType } from './user'
-import type User from './user'
-import type Shop from './shop'
+import {
+  DataTypes,
+  type ForeignKey,
+  type InferAttributes,
+  type InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from 'sequelize'
+import User, { ClientTypesEnum } from './user'
+import Store from './store'
 
-export enum PaymentMethod {
+export enum PaymentMethodsEnum {
   CASH = 'CASH',
   MOMO = 'MOMO',
 }
@@ -14,10 +20,13 @@ class Sale extends Model<InferAttributes<Sale>, InferCreationAttributes<Sale>> {
 
   // The client who made the sale, if he is not registered in the system use a phone number.
   declare clientId: ForeignKey<User['id']> | string
-  declare clientType: ClientType
-  declare shopId: ForeignKey<Shop['id']>
+  declare clientType: ClientTypesEnum
+  declare storeId: ForeignKey<Store['id']>
 
-  declare paymentMethod: PaymentMethod
+  declare paymentMethod: PaymentMethodsEnum
+
+  declare readonly client: NonAttribute<User> | undefined
+  declare readonly store: NonAttribute<Store>
 
   declare readonly createdAt: Date | undefined
   declare updatedAt: Date | undefined
@@ -34,8 +43,8 @@ Sale.init(
     },
     paymentMethod: {
       allowNull: false,
-      type: DataTypes.ENUM(PaymentMethod.CASH, PaymentMethod.MOMO),
-      defaultValue: PaymentMethod.MOMO,
+      type: DataTypes.ENUM(PaymentMethodsEnum.CASH, PaymentMethodsEnum.MOMO),
+      defaultValue: PaymentMethodsEnum.MOMO,
     },
     clientId: {
       allowNull: false,
@@ -47,14 +56,14 @@ Sale.init(
     },
     clientType: {
       allowNull: false,
-      type: DataTypes.ENUM(ClientType.USER, ClientType.CLIENT),
-      defaultValue: ClientType.USER,
+      type: DataTypes.ENUM(ClientTypesEnum.USER, ClientTypesEnum.CLIENT),
+      defaultValue: ClientTypesEnum.USER,
     },
-    shopId: {
+    storeId: {
       allowNull: false,
       type: DataTypes.UUID,
       references: {
-        model: 'Shops',
+        model: 'Stores',
         key: 'id',
       },
     },
@@ -71,5 +80,8 @@ Sale.init(
     tableName: 'Sales',
   }
 )
+
+Sale.belongsTo(User, { foreignKey: 'clientId', as: 'client' })
+Sale.belongsTo(Store, { foreignKey: 'storeId', as: 'store' })
 
 export default Sale

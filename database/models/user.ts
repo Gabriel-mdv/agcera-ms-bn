@@ -1,27 +1,27 @@
 // import { sequelize } from '@database/models/index';
-import sequelize from "@database/connection";
-import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from "sequelize";
-import Store from "./store";
+import sequelize from '@database/connection'
+import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from 'sequelize'
+import Store from './store'
 
-export enum ClientType {
+export enum ClientTypesEnum {
   USER = 'USER',
   CLIENT = 'CLIENT',
 }
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-  declare id: string |null;
-  declare name: string;
-  declare password: string;
-  declare email: string | null;
-  declare phone: string;
-  declare gender: string |null;
-  declare location: string ;
-  declare role: string;
-  declare isActive: boolean |null;
-  declare readonly createdAt: Date |null;
-  declare updatedAt:  Date | null;
-  declare deletedAt: Date | null;
-  declare storeId: ForeignKey<Store['id']>;
+  declare id: string | null
+  declare name: string
+  declare password: string
+  declare email: string | null
+  declare phone: string
+  declare gender: string | null
+  declare location: string
+  declare role: string
+  declare isActive: boolean | null
+  declare readonly createdAt: Date | null
+  declare updatedAt: Date | null
+  declare deletedAt: Date | null
+  declare storeId: ForeignKey<Store['id']>
 }
 
 User.init(
@@ -60,7 +60,6 @@ User.init(
       allowNull: false,
       defaultValue: 'unspecified',
     },
-
     location: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -71,10 +70,10 @@ User.init(
       allowNull: false,
       defaultValue: 'user',
     },
-    storeId:{
+    storeId: {
       type: DataTypes.UUID,
       allowNull: false,
-      },
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

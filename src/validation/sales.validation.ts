@@ -1,9 +1,9 @@
-import { PaymentMethod } from '@database/models/sale'
-import { ClientType } from '@database/models/user'
+import { PaymentMethodsEnum } from '@database/models/sale'
+import { ClientTypesEnum } from '@database/models/user'
 import Joi from 'joi'
 
-const paymentMethodValues = Object.values(PaymentMethod)
-const clientTypeValues = Object.values(ClientType)
+const paymentMethodValues = Object.values(PaymentMethodsEnum)
+const clientTypeValues = Object.values(ClientTypesEnum)
 
 export type CreateSaleProduct = {
   productId: string
@@ -11,29 +11,15 @@ export type CreateSaleProduct = {
 }
 
 const createSaleSchema = Joi.object({
-  products: Joi.array()
-    .items(
-      Joi.object({
-        productId: Joi.string().required().messages({
-          'string.base': 'productId should be a string',
-          'any.required': 'productId is required',
-        }),
-        quantity: Joi.number().min(1).required().messages({
-          'number.base': 'quantity should be a number',
-          'number.min': 'quantity should be at least 1',
-          'any.required': 'quantity is required',
-        }),
-      })
-    )
+  products: Joi.object()
+    .pattern(Joi.string().required(), Joi.number().integer().required())
     .min(1)
     .required()
     .messages({
-      'array.base': 'products should be an array of productId, quantity',
-      'array.min': 'At least one product is required',
-      'any.required': 'products are required',
+      'object.base': 'products should be an object of `productId: quantity`',
     }),
   paymentMethod: Joi.string()
-    .valid(...Object.values(PaymentMethod))
+    .valid(...Object.values(PaymentMethodsEnum))
     .required()
     .messages({
       'string.base': 'payment method should be a string',
@@ -45,7 +31,7 @@ const createSaleSchema = Joi.object({
     'any.required': 'clientId is required',
   }),
   clientType: Joi.string()
-    .valid(...Object.values(ClientType))
+    .valid(...Object.values(ClientTypesEnum))
     .required()
     .messages({
       'string.base': 'clientType should be a string',

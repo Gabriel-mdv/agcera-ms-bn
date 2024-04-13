@@ -12,7 +12,7 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
-        unique: true
+        unique: true,
       },
       location: {
         type: Sequelize.STRING,
@@ -22,7 +22,7 @@ module.exports = {
       },
       isOpen: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true
+        defaultValue: true,
       },
       createdAt: {
         allowNull: false,
@@ -30,15 +30,15 @@ module.exports = {
       },
       updatedAt: {
         allowNull: true,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       deletedAt: {
         allowNull: true,
-        type: Sequelize.DATE
-      }
-    });
+        type: Sequelize.DATE,
+      },
+    })
   },
   async down(queryInterface) {
-    await queryInterface.dropTable('Stores');
-  }
-};
+    await queryInterface.dropTable('Stores')
+  },
+}

@@ -1,16 +1,16 @@
-import { type Request, type Response } from 'express'
+import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
-import { userRegisterSchema, userLoginSchema, phoneSchema } from '../validation/userSchema'
+import { userRegisterSchema, userLoginSchema, phoneSchema, userUpdateSchema } from '../validation/user.validation'
 import { generateToken, verifyToken } from '../utils/jwtFunctions'
 import { UniqueConstraintError } from 'sequelize'
 import sendEmail from '../utils/sendEmail'
-import User from '@database/models/user'
+import userService from '../services/user.services'
 
 class UsersController {
-  static async register(req: Request, res: Response): Promise<Response> {
+  static async register(req: Request, res: Response): Promise<Response | undefined> {
     try {
-      //  Validate the body using joi
-      const { error } = userRegisterSchema.validate(req.body)
+      //  validate the body using joi
+      const { error, value } = userRegisterSchema.validate(req.body)
 
       if (error) {
         return res.status(400).json({
@@ -19,21 +19,23 @@ class UsersController {
         })
       }
 
-      const { gender, location, role, name, email, phone, password } = req.body
+      const { name, email, phone, password, storeId } = value
+      const { gender, location, role } = req.body
 
-      // Hash the password
+      // hash the password
       const hashedPassword = await bcrypt.hash(password, bcrypt.genSaltSync(10))
 
-      // Check if the user already exists
-      const newUser = await User.create({
+      // check if the user already exists
+      const newUser = await userService.registerUser(
         name,
+        hashedPassword,
         email,
-        password: hashedPassword,
         phone,
         gender,
         location,
-        role,
-      })
+        storeId,
+        role
+      )
 
       if (!newUser) {
         return res.status(400).json({
@@ -42,12 +44,12 @@ class UsersController {
         })
       }
 
-      // Generate token for the user
+      // generate token for the user
       const token = generateToken({ id: newUser.id, role: newUser.role })
-      // Store the token in the cookies
+      // store the token in the cookies
       res.cookie('AuthToken', token, { httpOnly: true, secure: true, sameSite: 'none' })
 
-      // Return the new user
+      // return the new user
       return res.status(200).json({
         status: 'success',
         data: newUser,
@@ -58,19 +60,24 @@ class UsersController {
           status: 'fail',
           message: 'User already exists',
         })
+      } else if (e.name === 'SequelizeForeignKeyConstraintError') {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'Invalid storeId. No Store found with the provided storeId.',
+        })
+      } else {
+        return res.status(500).json({
+          status: 'fail',
+          message: e.message,
+        })
       }
-
-      return res.status(500).json({
-        status: 'fail',
-        message: e.message,
-      })
     }
   }
 
-  // Login the user
-  static async Login(req: Request, res: Response): Promise<Response> {
+  // login the user
+  static async Login(req: Request, res: Response): Promise<Response | undefined> {
     try {
-      // Validate the body using joi
+      // validate the body using joi
       const { error, value } = userLoginSchema.validate(req.body)
 
       if (error) {
@@ -82,8 +89,9 @@ class UsersController {
 
       const { phone, password } = value
 
-      // Check if the user exists and login the user
-      const user = await User.findOne({ where: { phone } })
+      // check if the user exists and login the user
+      const user = await userService.loginUser(phone)
+
       if (!user) {
         return res.status(404).json({
           status: 'fail',
@@ -91,22 +99,22 @@ class UsersController {
         })
       }
 
-      // Compare the password using bcrypt
-      const isMatch = await bcrypt.compare(password, user.password)
+      // compare the password using bcrypt
+      const isMatch = await bcrypt.compare(password, user.password as string)
 
       if (!isMatch) {
         return res.status(400).json({
-          status: 400,
+          status: 'fail',
           message: 'Invalid credentials',
         })
       }
 
-      // Generate the token for the user
+      // generate the toke for the user
       const token = generateToken({ id: user.id, role: user.role })
-      // Store the token in the cookies
+      // store the token in the cookies
       res.cookie('AuthToken', token, { httpOnly: true, secure: true, sameSite: 'none' })
 
-      delete (user.dataValues as Record<string, any>).password
+      delete (user.dataValues as { [key: string]: any }).password
 
       return res.status(200).json({
         status: 'success',
@@ -120,10 +128,10 @@ class UsersController {
     }
   }
 
-  // Logout the user
+  // logout the user
   static async Logout(req: Request, res: Response): Promise<Response | undefined> {
     try {
-      // Clear the cookies
+      // clear the cookies
       res.clearCookie('AuthToken')
 
       return res.status(200).json({
@@ -138,14 +146,13 @@ class UsersController {
     }
   }
 
-  // Forgot password
+  // forgot password
   static async ForgotPasword(req: Request, res: Response): Promise<Response | undefined> {
     try {
-      // Validate the phone number
+      // validate the phone number
       const { error, value } = phoneSchema.validate(req.body)
 
-      const { phone } = value
-      console.log(phone)
+      const phone = value.phone
 
       if (error) {
         return res.status(400).json({
@@ -154,8 +161,8 @@ class UsersController {
         })
       }
 
-      // Check if the user exists
-      const user = await User.findOne({ where: { phone } })
+      // check if the user exists
+      const user = await userService.loginUser(phone)
       if (!user) {
         return res.status(404).json({
           status: 'fail',
@@ -163,10 +170,10 @@ class UsersController {
         })
       }
 
-      // Generate the token
+      // generate the token
       const token = generateToken({ id: user.id })
 
-      // Check if the use has email
+      // check if the use has email
       if (!user.email) {
         return res.status(400).json({
           status: 'fail',
@@ -174,9 +181,9 @@ class UsersController {
         })
       }
 
-      // Send the token to the user's email
+      // send the token to the user's email
       const sent_mail = await sendEmail(
-        user.email,
+        user.email as string,
         'Password Reset',
         `Please follow the link to reset the password http://localhost:4000/api/v1/users/reset/${token}`
       )
@@ -188,7 +195,7 @@ class UsersController {
         })
       }
 
-      // Send the token to the user's phone number
+      // send the token to the user's phone number
       return res.status(200).json({
         status: 'success',
         message: 'Token sent to your Email',
@@ -201,13 +208,13 @@ class UsersController {
     }
   }
 
-  // Reset password
+  // reset password
   static async resetPassword(req: Request, res: Response): Promise<Response | undefined> {
     try {
-      // Get the token from  params
+      // get the token from  params
       const { token } = req.params
 
-      // Verify the token
+      // verify the token
       const decoded_token = verifyToken(token)
       if (!decoded_token) {
         return res.status(400).json({
@@ -216,10 +223,10 @@ class UsersController {
         })
       }
 
-      const { id } = decoded_token as Record<string, Record<string, unknown>>
+      const { id } = decoded_token as { [key: string]: any }
 
-      // Get the user using the id
-      const user = await User.findOne({ where: { id } })
+      // get the user using the id
+      const user = await userService.getUserById(id)
 
       console.log(user)
 
@@ -230,7 +237,7 @@ class UsersController {
         })
       }
 
-      // Hash the new password
+      // hash the new password
       if (!req.body.password) {
         return res.status(400).json({
           status: 'fail',
@@ -240,7 +247,7 @@ class UsersController {
 
       const hashedPassword = await bcrypt.hash(req.body.password, bcrypt.genSaltSync(10))
 
-      // Update the password
+      // update the password
       user.password = hashedPassword
       await user.save()
 
@@ -256,10 +263,10 @@ class UsersController {
     }
   }
 
-  // Get all users
+  // get all users
   static async getAllUsers(req: Request, res: Response): Promise<Response | undefined> {
     try {
-      const users = await User.findAll()
+      const users = await userService.getAllUsers()
 
       return res.status(200).json({
         status: 'success',
@@ -273,12 +280,12 @@ class UsersController {
     }
   }
 
-  // Get single user profile
+  // get single user profile
   static async getSingleUser(req: Request, res: Response): Promise<Response | undefined> {
     try {
       const { id } = req.params
 
-      const user = await User.findOne({ where: { id } })
+      const user = await userService.getUserById(id)
 
       if (!user) {
         return res.status(404).json({
@@ -286,6 +293,51 @@ class UsersController {
           message: 'User not found',
         })
       }
+
+      return res.status(200).json({
+        status: 'success',
+        data: user,
+      })
+    } catch (e: any) {
+      return res.status(500).json({
+        status: 'fail',
+        message: e.message,
+      })
+    }
+  }
+
+  // update user profile
+  static async updateUser(req: Request, res: Response): Promise<Response | undefined> {
+    try {
+      const { id } = req.params
+
+      const user = await userService.getUserById(id)
+      if (!user) {
+        return res.status(404).json({
+          status: 'fail',
+          message: 'User not found',
+        })
+      }
+
+      // update the user
+      const { error, value } = userUpdateSchema.validate(req.body)
+      if (error) {
+        return res.status(400).json({
+          status: 'fail',
+          message: error.message,
+        })
+      }
+
+      const { name, email, phone, storeId } = value
+
+      name ? (user.name = name) : null
+      email ? (user.email = email) : null
+      phone ? (user.phone = phone) : null
+      storeId ? (user.storeId = storeId) : null
+
+      await user.save()
+
+      delete (user.dataValues as { [key: string]: any }).password
 
       return res.status(200).json({
         status: 'success',
