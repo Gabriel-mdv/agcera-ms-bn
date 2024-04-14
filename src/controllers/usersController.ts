@@ -7,12 +7,13 @@ import sendEmail from '../utils/sendEmail'
 import userService from '../services/user.services'
 import StoreServices from '@src/services/store.services'
 import { RequestWithUser } from '@src/types/common.types'
+import { validateUUIDV4 } from '@src/validation/common.validation'
 
 class UsersController {
   static async register(req: Request, res: Response): Promise<Response> {
     try {
       //  validate the body using joi
-      const { error } = userRegisterSchema.validate(req.body)
+      const { error, value } = userRegisterSchema.validate(req.body)
 
       if (error) {
         return res.status(400).json({
@@ -21,7 +22,7 @@ class UsersController {
         })
       }
 
-      const { name, email, phone, password, storeId, gender, location, role } = req.body
+      const { name, email, phone, password, storeId, gender, location, role } = value
 
       // Check if user already exists and was not deleted before
       const user = await userService.getOneUser({ [Op.or]: [{ email }, { phone }] })
@@ -86,7 +87,7 @@ class UsersController {
   static async Login(req: Request, res: Response): Promise<Response | undefined> {
     try {
       // validate the body using joi
-      const { error } = userLoginSchema.validate(req.body)
+      const { error, value } = userLoginSchema.validate(req.body)
 
       if (error) {
         return res.status(400).json({
@@ -95,7 +96,7 @@ class UsersController {
         })
       }
 
-      const { phone, password } = req.body
+      const { phone, password } = value
 
       // check if the user exists and login the user
       const user = await userService.loginUser(phone)
@@ -289,8 +290,16 @@ class UsersController {
   // get single user profile
   static async getSingleUser(req: RequestWithUser, res: Response): Promise<Response> {
     try {
-      const { id } = req.params
       const user = req.user!
+      const { id } = req.params
+
+      const { error } = validateUUIDV4(id)
+      if (error) {
+        return res.status(400).json({
+          status: 'fail',
+          message: error.message,
+        })
+      }
 
       const foundUser = await userService.getUserById(id)
 
@@ -377,6 +386,14 @@ class UsersController {
     try {
       const user = req.user!
       const { id } = req.params
+
+      const { error } = validateUUIDV4(id)
+      if (error) {
+        return res.status(400).json({
+          status: 'fail',
+          message: error.message,
+        })
+      }
 
       if (user.id === id) {
         return res.status(403).json({

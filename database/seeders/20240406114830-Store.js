@@ -6,12 +6,12 @@ module.exports = {
     await queryInterface.bulkInsert(
       'Stores',
       [
-        {
+        { // This should always be there. It is the main store
           id: '143e4667-a81d-12d3-c356-469311174300',
-          name: 'main store',
+          name: 'main',
           location: 'Maputo 12',
           phone: '+258840000000',
-          isActive: false,
+          isActive: true,
           createdAt: new Date(),
         },
         {

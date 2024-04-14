@@ -1,11 +1,11 @@
 import sequelize from '@database/connection'
 import {
   DataTypes,
+  Model,
   NonAttribute,
   type Association,
   type InferAttributes,
   type InferCreationAttributes,
-  Model,
 } from 'sequelize'
 import StoreProduct from './storeproduct'
 import User from './user'
@@ -16,6 +16,7 @@ class Store extends Model<InferAttributes<Store>, InferCreationAttributes<Store>
   declare phone: string
   declare location: string
   declare isActive: boolean | null
+
   declare readonly createdAt: Date | null
   declare updatedAt: Date | null
   declare deletedAt: Date | null
@@ -25,6 +26,7 @@ class Store extends Model<InferAttributes<Store>, InferCreationAttributes<Store>
 
   declare static associations: {
     users: Association<User, Store>
+    products: Association<StoreProduct, Store>
   }
 }
 

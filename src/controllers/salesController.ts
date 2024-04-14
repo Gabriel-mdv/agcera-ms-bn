@@ -1,6 +1,6 @@
 import SalesServices from '@src/services/sales.services'
 import { RequestWithUser } from '@src/types/common.types'
-import { GetAllSalesRequestQuery } from '@src/types/sales.types'
+import { GetAllRequestQuery } from '@src/types/sales.types'
 import { ClientTypesEnum } from '@src/types/user.types'
 import { formatSortQuery } from '@src/utils/formatters'
 import { type Response } from 'express'
@@ -42,14 +42,22 @@ class SalesController {
   }
 
   static async getAllSales(
-    req: RequestWithUser<object, object, object, GetAllSalesRequestQuery<string>>,
+    req: RequestWithUser<object, object, object, GetAllRequestQuery<string>>,
     res: Response
   ): Promise<Response> {
     try {
       const { role: userRole, id: userId } = req.user!
       const { search, limit, skip, sort } = req.query
 
-      const formattedSort = sort && formatSortQuery(sort, res)
+      let formattedSort = null
+      try {
+        formattedSort = sort && formatSortQuery(sort)
+      } catch (e: any) {
+        return res.status(400).json({
+          status: 400,
+          message: e.message,
+        })
+      }
 
       const where: WhereOptions = {}
       const include: IncludeOptions[] = []
@@ -71,7 +79,7 @@ class SalesController {
           search,
           limit,
           skip,
-          sort: formattedSort as GetAllSalesRequestQuery['sort'],
+          sort: formattedSort as GetAllRequestQuery['sort'],
         },
         where,
         include

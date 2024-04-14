@@ -1,23 +1,19 @@
-import { GetAllSalesRequestQuery } from '@src/types/sales.types'
-import { Response } from 'express'
+import { SortDirectionEnum } from '@src/types/common.types'
+import { GetAllRequestQuery } from '@src/types/sales.types'
 
-// Can return error
-export const formatSortQuery = (data: string, res: Response): GetAllSalesRequestQuery['sort'] | Response => {
+// Throws an error if the sort query is invalid
+export const formatSortQuery = (data: string): GetAllRequestQuery['sort'] => {
+  console.log(data)
   const sorts = data.split(',').map((sort) => sort.trim())
-  const sortQuery: any = {}
+  const sortQuery: GetAllRequestQuery['sort'] = {}
 
   for (const sort of sorts) {
     if (!sort.includes(':')) {
-      if (res) {
-        return res.status(400).json({
-          status: 400,
-          message: 'Invalid sort query, must be in the format key:(ASC or DESC)]',
-        })
-      }
-      throw new Error('')
+      throw new Error('Invalid sort query, must be in the format key:(ASC or DESC)]')
     }
     const [key, value] = sort.split(':').map((sort) => sort.trim())
-    sortQuery[key] = value
+    const direction = Object.values(SortDirectionEnum).find((sort) => sort === value.toUpperCase())
+    direction && (sortQuery[key] = direction)
   }
 
   return sortQuery

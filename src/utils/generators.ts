@@ -1,40 +1,55 @@
-import { GetAllSalesRequestQuery } from '@src/types/sales.types'
+import { GetAllRequestQuery } from '@src/types/sales.types'
 import { Op } from 'sequelize'
 
-export const findQueryGenerators = (queryData: GetAllSalesRequestQuery, additionalData: any) => {
-  const { skip, limit, sort, search } = queryData
+export const findQueryGenerators = (
+  modelAttributes: { [key: string]: any },
+  queryData?: GetAllRequestQuery,
+  additionalData?: any
+) => {
+  const { skip, limit, sort, search } = queryData ?? {}
 
-  const findQuery: any = {}
+  const findQuery: any = { distinct: true }
+
   skip && (findQuery['offset'] = skip)
   limit && (findQuery['limit'] = limit)
   sort && (findQuery['order'] = Object.entries(sort).map(([key, value]) => [key, value]))
-
-  if (search) {
-    findQuery['where'] = {
-      [Op.iLike]: `%${search}%`,
-    }
-  }
 
   if (additionalData) {
     Object.assign(findQuery, additionalData)
   }
 
-  if (findQuery.include) {
-    if (Array.isArray(findQuery.include)) {
-      findQuery.include = findQuery.include.map((include: any) => {
-        if (typeof include === 'object') {
-          if (include.where) {
-            include.where = {
-              ...include.where,
-              ...findQuery.where,
-            }
-          } else {
-            include.where = findQuery.where
-          }
-        }
-        return include
-      })
+  if (search) {
+    const attributesSearch = Object.entries(modelAttributes).reduce((prev, [attribute, attributeValue]) => {
+      if (attributeValue.type.constructor.name === 'STRING') {
+        prev.push({
+          [attribute]: { [Op.like]: `%${search}%` },
+        })
+      }
+      return prev
+    }, [] as any[])
+
+    findQuery.where = {
+      ...findQuery['where'],
+      [Op.or]: attributesSearch,
     }
+
+    // if (findQuery.include && Array.isArray(findQuery.include)) {
+    //   findQuery.include = findQuery.include.map((include: IncludeOptions) => {
+    //     if (typeof include === 'object') {
+    //       if (include.where && search) {
+    //         include.where = {
+    //           ...include['where'],
+    //           // [Op.or]: attributesSearch,
+    //         }
+    //       } else {
+    //         // include['where'] = {
+    //         //   [Op.or]: attributesSearch,
+    //         // }
+    //       }
+    //     }
+    //     return include
+    //   })
+    // }
   }
 
   return findQuery

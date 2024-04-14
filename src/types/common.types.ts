@@ -8,6 +8,6 @@ export interface RequestWithUser<P = core.ParamsDictionary, ResBody = any, ReqBo
 }
 
 export enum SortDirectionEnum {
-  ASC = 'asc',
-  DESC = 'desc',
+  ASC = 'ASC',
+  DESC = 'DESC',
 }

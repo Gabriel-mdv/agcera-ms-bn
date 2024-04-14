@@ -1,7 +1,7 @@
 import Sale from '@database/models/sale'
 import Store from '@database/models/store'
 import User from '@database/models/user'
-import { GetAllSalesRequestQuery } from '@src/types/sales.types'
+import { GetAllRequestQuery } from '@src/types/sales.types'
 import { ClientTypesEnum } from '@src/types/user.types'
 import { findQueryGenerators } from '@src/utils/generators'
 import { IncludeOptions, WhereOptions } from 'sequelize'
@@ -9,7 +9,7 @@ import { IncludeOptions, WhereOptions } from 'sequelize'
 
 class SalesServices {
   static async getAllSales(
-    queryData: GetAllSalesRequestQuery,
+    queryData: GetAllRequestQuery,
     where: WhereOptions<Sale> | null = null,
     include: IncludeOptions | IncludeOptions[] | null = null
   ) {
@@ -24,7 +24,9 @@ class SalesServices {
       ]
     }
 
-    const { count, rows } = await Sale.findAndCountAll(findQueryGenerators(queryData, additionalData))
+    const { count, rows } = await Sale.findAndCountAll(
+      findQueryGenerators(Sale.getAttributes(), queryData, additionalData)
+    )
     return { total: count, sales: rows }
   }
 }

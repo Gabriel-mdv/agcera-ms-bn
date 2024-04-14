@@ -14,9 +14,11 @@ export interface CreateSaleRequest {
   shopId: number
 }
 
-export interface GetAllSalesRequestQuery<Sort = { [key: string]: SortDirectionEnum } | string> {
-  search: string | null
-  skip: number | null
-  limit: number | null
-  sort: Sort
+export interface GetAllRequestQuery<
+  Sort extends { [key: string]: SortDirectionEnum } | string = { [key: string]: SortDirectionEnum },
+> {
+  search?: string
+  skip?: number
+  limit?: number
+  sort?: Sort
 }

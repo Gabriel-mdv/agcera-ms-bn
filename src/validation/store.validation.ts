@@ -15,8 +15,8 @@ export const storeRegisterSchema = Joi.object({
       'string.empty': 'Phone number cannot be empty',
       'any.required': 'Phone number is a required field',
     }),
-  isOpen: Joi.string().default('true'),
-}).unknown()
+  isActive: Joi.bool(),
+})
 
 export const storeUpdateSchema = Joi.object({
   name: Joi.string().messages({
@@ -32,5 +32,5 @@ export const storeUpdateSchema = Joi.object({
       'string.empty': 'Phone number cannot be empty',
       'any.required': 'Phone number is a required field',
     }),
-  isOpen: Joi.string().default('true'),
-}).unknown()
+  isActive: Joi.bool(),
+})

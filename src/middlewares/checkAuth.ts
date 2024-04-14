@@ -23,7 +23,7 @@ const checkRoleMiddleware =
     if (!decoded_token) {
       return res.status(401).json({
         status: 'fail',
-        message: 'Unauthorized. Please Login!',
+        message: 'Invalid Token supplied! Please Login again!',
       })
     }
 
@@ -33,7 +33,7 @@ const checkRoleMiddleware =
     if (!id) {
       return res.status(401).json({
         status: 'fail',
-        message: 'Unauthorized. Please Login!',
+        message: 'Invalid Token supplied! Please Login again!',
       })
     }
 
@@ -61,7 +61,7 @@ const checkRoleMiddleware =
 
     return res.status(403).json({
       status: 'fail',
-      message: 'Access Forbidden',
+      message: 'You are not authorized to perform this action',
     })
   }
 

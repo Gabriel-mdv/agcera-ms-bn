@@ -1,12 +1,14 @@
 import { Router } from 'express'
 import ShopsController from '../controllers/storesController'
-const { createStore, getStores, singleStore, updateStore, deleteStore } = ShopsController
+import { isAdmin, isStoreKeeperUp } from '@src/middlewares/checkAuth'
+import { ControllerWrapper } from '@src/utils/wrappers'
 
 const router = Router()
-router.post('/', createStore)
-router.get('/all', getStores)
-router.get('/:id', singleStore)
-router.patch('/:id', updateStore)
-router.delete('/:id', deleteStore)
+
+router.post('/', isAdmin, ControllerWrapper(ShopsController.createStore))
+router.get('/', isStoreKeeperUp, ControllerWrapper(ShopsController.getStores))
+router.get('/:id', isStoreKeeperUp, ControllerWrapper(ShopsController.singleStore))
+router.patch('/:id', isStoreKeeperUp, ControllerWrapper(ShopsController.updateStore))
+router.delete('/:id', isAdmin, ControllerWrapper(ShopsController.deleteStore))
 
 export default router
