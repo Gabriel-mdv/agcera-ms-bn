@@ -15,10 +15,15 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      image: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: 'https://via.placeholder.com/150?text=image%20not%20found',
+      },
       type: {
         type: Sequelize.ENUM('STANDARD', 'SPECIAL'),
         allowNull: false,
-        defaultValue: 'STANDARD',
+        defaultValue: 'STANDARD'
       },
       description: Sequelize.STRING,
       createdAt: {

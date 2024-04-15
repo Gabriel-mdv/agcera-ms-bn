@@ -1,4 +1,4 @@
-import SalesServices from '@src/services/sales.services'
+import SaleServices from '@src/services/sale.services'
 import { RequestWithUser } from '@src/types/common.types'
 import { GetAllRequestQuery } from '@src/types/sales.types'
 import { ClientTypesEnum } from '@src/types/user.types'
@@ -23,7 +23,7 @@ class SalesController {
       // // Check products exists and are available in the shop
       // const productsIds = Object.keys(products)
       // for (const productId of productsIds) {
-      //   const product = await SalesServices.getProductById(productId, { shopId })
+      //   const product = await SaleServices.getProductById(productId, { shopId })
       // }
       // console.log(user?.email, products, paymentMethod, clientId, clientType, shopId)
 
@@ -32,7 +32,7 @@ class SalesController {
         message: 'Sale created successfully',
       })
 
-      // const sale = await SalesServices.createSale(user, products, paymentMethod, clientId, clientType, shopId)
+      // const sale = await SaleServices.createSale(user, products, paymentMethod, clientId, clientType, shopId)
     } catch (error) {
       return res.status(500).json({
         status: 'fail',
@@ -74,7 +74,7 @@ class SalesController {
           break
       }
 
-      const { sales, total } = await SalesServices.getAllSales(
+      const { sales, total } = await SaleServices.getAllSales(
         {
           search,
           limit,

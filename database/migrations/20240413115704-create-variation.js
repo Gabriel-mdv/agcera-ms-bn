@@ -4,30 +4,52 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Variations', {
       id: {
-        unique: true,
-        allowNull: false,
-        primaryKey: true,
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
+      unique: true,
+      allowNull: false,
+      primaryKey: true,
+      type: Sequelize.UUID,
+      defaultValue: Sequelize.UUIDV4,
+    },
+    name: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    description: Sequelize.STRING,
+    costPrice: {
+      type: Sequelize.DECIMAL,
+      allowNull: false,
+      validate: {
+        min: 0,
       },
-      name: Sequelize.STRING,
-      description: Sequelize.STRING,
-      costPrice: Sequelize.DECIMAL,
-      sellingPrice: Sequelize.DECIMAL,
-      productId: Sequelize.UUID,
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: new Date(),
+    },
+    sellingPrice: {
+      type: Sequelize.DECIMAL,
+      allowNull: false,
+      validate: {
+        isGreaterThanCostPrice(value) {
+          if (this.costPrice > value) {
+            throw new Error('Selling price must be greater than cost price')
+          }
+        },
       },
-      updatedAt: {
-        allowNull: true,
-        type: Sequelize.DATE,
+    },
+    productId: {
+      type: Sequelize.UUID,
+      allowNull: false,
+      references: {
+        model: 'Products',
+        key: 'id',
       },
-      deletedAt: {
-        allowNull: true,
-        type: Sequelize.DATE,
-      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    },
+    createdAt: {
+      allowNull: false,
+      type: Sequelize.DATE,
+      defaultValue: new Date(),
+    },
+    updatedAt: Sequelize.DATE,
+    deletedAt: Sequelize.DATE,
     })
   },
   async down(queryInterface) {

@@ -8,11 +8,12 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
   Model,
+  CreationOptional,
 } from 'sequelize'
 import Store from './store'
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-  declare id: string | null
+  declare id: CreationOptional<string>
   declare name: string
   declare password: string
   declare phone: string
@@ -24,7 +25,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
 
   declare storeId: ForeignKey<Store['id']>
 
-  declare readonly createdAt: Date | null
+  declare readonly createdAt: CreationOptional<Date>
   declare updatedAt: Date | null
   declare deletedAt: Date | null
 }

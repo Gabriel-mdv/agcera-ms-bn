@@ -1,4 +1,4 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, ForeignKey } from 'sequelize'
+import { Model, DataTypes, InferAttributes, InferCreationAttributes, ForeignKey, CreationOptional } from 'sequelize'
 import Sale from './sale'
 import sequelize from '@database/connection'
 import Product from './product'
@@ -11,7 +11,7 @@ class SaleProduct extends Model<InferAttributes<SaleProduct>, InferCreationAttri
 
   declare quantity: number | undefined
 
-  declare readonly createdAt: Date | undefined
+  declare readonly createdAt: CreationOptional<Date>
   declare updatedAt: Date | undefined
   declare deletedAt: Date | undefined
 }

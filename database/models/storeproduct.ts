@@ -1,16 +1,33 @@
 import sequelize from '@database/connection'
-import { InferAttributes, InferCreationAttributes, Model, DataTypes, ForeignKey } from 'sequelize'
+import {
+  Association,
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from 'sequelize'
 import Product from './product'
 import Store from './store'
 
 class StoreProduct extends Model<InferAttributes<StoreProduct>, InferCreationAttributes<StoreProduct>> {
-  declare id: string
+  declare id: CreationOptional<string>
   declare quantity: number
 
   declare storeId: ForeignKey<Store['id']>
   declare productId: ForeignKey<Product['id']>
 
-  declare readonly createdAt: Date
+  declare store?: NonAttribute<Store>
+  declare product?: NonAttribute<Product>
+
+  declare static associations: {
+    store: Association<StoreProduct, Store>
+    product: Association<StoreProduct, Product>
+  }
+
+  declare readonly createdAt: CreationOptional<Date>
   declare updatedAt: Date | null
   declare deletedAt: Date | null
 }
@@ -62,13 +79,13 @@ StoreProduct.init(
   }
 )
 
-StoreProduct.belongsTo(Store, {
-  foreignKey: 'storeId',
-  as: 'products',
+StoreProduct.belongsTo(Product, {
+  foreignKey: 'productId',
+  as: 'product',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 })
-StoreProduct.belongsTo(Product, {
+Product.hasMany(StoreProduct, {
   foreignKey: 'productId',
   as: 'stores',
   onDelete: 'CASCADE',

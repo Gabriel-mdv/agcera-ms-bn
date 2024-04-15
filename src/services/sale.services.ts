@@ -7,7 +7,7 @@ import { findQueryGenerators } from '@src/utils/generators'
 import { IncludeOptions, WhereOptions } from 'sequelize'
 // import { Op } from 'sequelize'
 
-class SalesServices {
+class SaleServices {
   static async getAllSales(
     queryData: GetAllRequestQuery,
     where: WhereOptions<Sale> | null = null,
@@ -31,4 +31,4 @@ class SalesServices {
   }
 }
 
-export default SalesServices
+export default SaleServices

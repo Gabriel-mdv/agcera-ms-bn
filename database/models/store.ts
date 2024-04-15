@@ -1,5 +1,6 @@
 import sequelize from '@database/connection'
 import {
+  CreationOptional,
   DataTypes,
   Model,
   NonAttribute,
@@ -11,13 +12,13 @@ import StoreProduct from './storeproduct'
 import User from './user'
 
 class Store extends Model<InferAttributes<Store>, InferCreationAttributes<Store>> {
-  declare id: string | null
+  declare id: CreationOptional<string>
   declare name: string
   declare phone: string
   declare location: string
   declare isActive: boolean | null
 
-  declare readonly createdAt: Date | null
+  declare readonly createdAt: CreationOptional<Date>
   declare updatedAt: Date | null
   declare deletedAt: Date | null
 
@@ -73,6 +74,19 @@ Store.init(
     paranoid: true,
   }
 )
+
+StoreProduct.belongsTo(Store, {
+  foreignKey: 'storeId',
+  as: 'store',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+})
+Store.hasMany(StoreProduct, {
+  foreignKey: 'storeId',
+  as: 'products',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+})
 
 Store.hasMany(User, {
   foreignKey: 'storeId',

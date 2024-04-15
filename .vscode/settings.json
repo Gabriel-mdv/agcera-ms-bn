@@ -1,4 +1,7 @@
 {
   "editor.tabSize": 2,
-  "prettier.printWidth": 100
+  "prettier.printWidth": 120,
+  "editor.guides.bracketPairs": true,
+  "editor.wordWrap": "on",
+  "editor.wordWrapColumn": 120
 }

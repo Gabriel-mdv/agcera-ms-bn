@@ -6,6 +6,7 @@ import {
   type InferCreationAttributes,
   Model,
   NonAttribute,
+  CreationOptional,
 } from 'sequelize'
 import User from './user'
 import Store from './store'
@@ -29,7 +30,7 @@ class Sale extends Model<InferAttributes<Sale>, InferCreationAttributes<Sale>> {
   declare readonly client: NonAttribute<User> | undefined
   declare readonly store: NonAttribute<Store>
 
-  declare readonly createdAt: Date | undefined
+  declare readonly createdAt: CreationOptional<Date>
   declare updatedAt: Date | undefined
   declare deletedAt: Date | undefined
 }

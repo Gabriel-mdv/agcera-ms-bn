@@ -5,6 +5,26 @@ import { IncludeOptions, WhereOptions } from 'sequelize'
 
 class StoreServices {
   private store: Store
+  static DEFAULT_INCLUDES: IncludeOptions[] = [
+    {
+      association: 'users',
+      attributes: { exclude: ['password', 'createdAt', 'updatedAt', 'deletedAt', 'storeId'] },
+    },
+    {
+      association: 'products',
+      include: [
+        {
+          association: 'store',
+          attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+        },
+        {
+          association: 'product',
+          attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+        },
+      ],
+      attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+    },
+  ]
 
   constructor() {
     this.store = new Store()
@@ -17,17 +37,7 @@ class StoreServices {
 
   // get all stores
   static async getAllStores(queryData?: GetAllRequestQuery, where?: WhereOptions, includes?: IncludeOptions[]) {
-    const include: IncludeOptions[] = [
-      {
-        association: 'users',
-        attributes: { exclude: ['password', 'createdAt', 'updatedAt', 'deletedAt', 'storeId'] },
-      },
-      // {
-      //   association: 'products',
-      //   attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-      // },
-      ...(includes ?? []),
-    ]
+    const include: IncludeOptions[] = [this.DEFAULT_INCLUDES[0], ...(includes ?? [])]
 
     const { count, rows } = await Store.findAndCountAll(
       findQueryGenerators(Store.getAttributes(), queryData, { where, include })
@@ -40,32 +50,14 @@ class StoreServices {
   static async getOneStore(where: WhereOptions) {
     return await Store.findOne({
       where,
-      include: [
-        {
-          association: 'users',
-          attributes: { exclude: ['password', 'createdAt', 'updatedAt', 'deletedAt', 'storeId'] },
-        },
-        // {
-        //   association: 'products',
-        //   attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-        // },
-      ],
+      include: this.DEFAULT_INCLUDES,
     })
   }
 
   // get store by id
   static async getStoreById(id: string) {
     return await Store.findByPk(id, {
-      include: [
-        {
-          association: 'users',
-          attributes: { exclude: ['password', 'createdAt', 'updatedAt', 'deletedAt', 'storeId'] },
-        },
-        // {
-        //   association: 'products',
-        //   attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-        // },
-      ],
+      include: this.DEFAULT_INCLUDES,
     })
   }
 

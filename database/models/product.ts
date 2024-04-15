@@ -1,24 +1,33 @@
-import { Association, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from 'sequelize'
-import Store from './user'
-import Varitation from './varitation'
 import sequelize from '@database/connection'
 import { ProductTypesEnum } from '@src/types/product.types'
+import {
+  Association,
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from 'sequelize'
+import Store from './user'
+import Variation from './variation'
 
 class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Product>> {
-  declare id: string | null
+  declare id: CreationOptional<string>
   declare name: string
-  declare description: string | null
   declare type: ProductTypesEnum
+  declare image: CreationOptional<string>
+  declare description: string | null
 
-  declare variations?: NonAttribute<Varitation[]>
+  declare variations?: NonAttribute<Variation[]>
   declare stores?: NonAttribute<Store[]>
 
   declare static associations: {
-    variations: Association<Varitation, Product>
+    variations: Association<Variation, Product>
     stores: Association<Product, Store>
   }
 
-  declare readonly createdAt: Date
+  declare readonly createdAt: CreationOptional<Date>
   declare updatedAt: Date | null
   declare deletedAt: Date | null
 }
@@ -36,6 +45,11 @@ Product.init(
       unique: true,
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'https://via.placeholder.com/150?text=image%20not%20found',
     },
     type: {
       type: DataTypes.ENUM(...Object.values(ProductTypesEnum)),
@@ -55,14 +69,19 @@ Product.init(
     sequelize: sequelize,
     modelName: 'Product',
     tableName: 'Products',
+    paranoid: true,
   }
 )
 
-Product.hasMany(Varitation, {
+Product.hasMany(Variation, {
   foreignKey: 'productId',
   as: 'variations',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
+})
+Variation.belongsTo(Product, {
+  foreignKey: 'productId',
+  as: 'product',
 })
 
 export default Product
