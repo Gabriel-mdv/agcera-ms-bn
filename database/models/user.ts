@@ -1,22 +1,33 @@
 // import { sequelize } from '@database/models/index';
-import sequelize from "@database/connection";
-import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from "sequelize";
-import Store from "./store";
+import sequelize from '@database/connection'
+import { UserGendersEnum, UserRolesEnum } from '@src/types/user.types'
+import {
+  // Association,
+  DataTypes,
+  ForeignKey,
+  type InferAttributes,
+  type InferCreationAttributes,
+  Model,
+  CreationOptional,
+} from 'sequelize'
+import Store from './store'
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-  declare id: String |null;
-  declare name: String;
-  declare password: String;
-  declare email: String | null;
-  declare phone: String;
-  declare gender: String |null;
-  declare location: String ;
-  declare role: String;
-  declare isActive: Boolean |null;
-  declare readonly createdAt: Date |null;
-  declare updatedAt:  Date | null;
-  declare deletedAt: Date | null;
-  declare storeId: ForeignKey<Store['id']>;
+  declare id: CreationOptional<string>
+  declare name: string
+  declare password: string
+  declare phone: string
+  declare location: string
+  declare role: UserRolesEnum
+  declare email: string | null
+  declare gender: string | null
+  declare isActive: boolean | null
+
+  declare storeId: ForeignKey<Store['id']>
+
+  declare readonly createdAt: CreationOptional<Date>
+  declare updatedAt: Date | null
+  declare deletedAt: Date | null
 }
 
 User.init(
@@ -28,23 +39,24 @@ User.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
     },
-    name:{
+    name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        min: 4,
+      },
     },
     email: {
       type: DataTypes.STRING,
       allowNull: true,
       unique: true,
-
-    },
-    createdAt: {
-      allowNull: false,
-      type: DataTypes.DATE,
+      validate: {
+        isEmail: true,
+      },
     },
     phone: {
       type: DataTypes.STRING,
@@ -52,41 +64,47 @@ User.init(
       unique: true,
     },
     gender: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM(...Object.values(UserGendersEnum)),
       allowNull: false,
-      defaultValue: 'unspecified'
+      defaultValue: UserGendersEnum.UNSPECIFIED,
     },
-
     location: {
       type: DataTypes.STRING,
-      allowNull:false,
-      defaultValue: 'Maputo Center'
+      allowNull: false,
+      defaultValue: 'Maputo Center',
     },
     role: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM(...Object.values(UserRolesEnum)),
       allowNull: false,
-      defaultValue: "user",
+      defaultValue: UserRolesEnum.USER,
     },
-    storeId:{
+    storeId: {
       type: DataTypes.UUID,
       allowNull: false,
+      references: {
+        model: 'Stores',
+        key: 'id',
       },
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true,
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: new Date(),
     },
     updatedAt: DataTypes.DATE,
     deletedAt: DataTypes.DATE,
   },
   {
     sequelize: sequelize,
-    modelName: "User",
-    tableName: "Users",
+    modelName: 'User',
+    tableName: 'Users',
+    paranoid: true,
   }
 )
-
-
-
 
 export default User

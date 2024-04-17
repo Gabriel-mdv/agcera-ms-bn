@@ -1,59 +1,87 @@
-import { Association, DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from "sequelize";
-import Store from "./user";
-import sequelize from "@database/connection";
-import Varitation from "./varitation";
+import sequelize from '@database/connection'
+import { ProductTypesEnum } from '@src/types/product.types'
+import {
+  Association,
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+} from 'sequelize'
+import Store from './user'
+import Variation from './variation'
 
 class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Product>> {
-  declare id: String |null;
-  declare name: String;
-  declare description: String | null;
-  declare price: Number;
-  declare qt_in_stock: Number;
-  declare type: String;
-  declare costPrice: Number;
-  declare sellingPrice: Number;
-  declare storeId: ForeignKey<Store['id']> | null;
-  declare readonly createdAt: Date;
-  declare updatedAt:  Date | null;
-  declare deletedAt: Date | null;
+  declare id: CreationOptional<string>
+  declare name: string
+  declare type: ProductTypesEnum
+  declare image: CreationOptional<string>
+  declare description: string | null
+
+  declare variations?: NonAttribute<Variation[]>
+  declare stores?: NonAttribute<Store[]>
+
+  declare static associations: {
+    variations: Association<Variation, Product>
+    stores: Association<Product, Store>
+  }
+
+  declare readonly createdAt: CreationOptional<Date>
+  declare updatedAt: Date | null
+  declare deletedAt: Date | null
 }
 
-
-  Product.init({
-    id:{
+Product.init(
+  {
+    id: {
       unique: true,
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
+      defaultValue: DataTypes.UUIDV4,
     },
-    name: DataTypes.STRING,
+    name: {
+      unique: true,
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'https://via.placeholder.com/150?text=image%20not%20found',
+    },
+    type: {
+      type: DataTypes.ENUM(...Object.values(ProductTypesEnum)),
+      allowNull: false,
+      defaultValue: ProductTypesEnum.STANDARD,
+    },
     description: DataTypes.STRING,
-    price: DataTypes.DECIMAL,
-    qt_in_stock: DataTypes.INTEGER,
-    type: DataTypes.STRING,
-    costPrice: DataTypes.DECIMAL,
-    sellingPrice: DataTypes.DECIMAL,
-    storeId: DataTypes.STRING,
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      defaultValue: new Date()
+      defaultValue: new Date(),
     },
     updatedAt: DataTypes.DATE,
     deletedAt: DataTypes.DATE,
-  }, {
-    sequelize,
+  },
+  {
+    sequelize: sequelize,
     modelName: 'Product',
-    tableName: 'Products'
-  });
+    tableName: 'Products',
+    paranoid: true,
+  }
+)
 
-  Product.hasMany(Varitation, {
-    foreignKey: 'productId',
-    as: 'variations',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-  })
-  
-  
-  export default Product;
+Product.hasMany(Variation, {
+  foreignKey: 'productId',
+  as: 'variations',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+})
+Variation.belongsTo(Product, {
+  foreignKey: 'productId',
+  as: 'product',
+})
+
+export default Product
