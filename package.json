@@ -10,43 +10,66 @@
     "db:rollback": "sequelize db:migrate:undo:all",
     "build": "tsc && tsc-alias",
     "start": "npm run db:migrate && npm run db:seed && node build/server.js",
-    "build:docker": "make build"
+    "build:docker": "make build",
+    "prepare": "husky",
+    "lint": "eslint . --fix",
+    "format": "prettier --write ."
   },
   "author": "Jean Gabriel & Shema Alain",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/multer": "^1.4.11",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "cloudinary": "^2.1.0",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
     "joi": "^17.12.2",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.1",
+    "tsoa": "^6.2.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.7",
     "@types/express": "^4.17.21",
-    "@types/joi": "^17.2.3",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^20.11.30",
+    "@types/node": "^20.12.7",
     "@types/nodemailer": "^6.4.14",
     "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^7.6.0",
+    "@typescript-eslint/parser": "^7.6.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
     "morgan": "^1.10.0",
+    "prettier": "^3.2.5",
     "sequelize-cli": "^6.6.2",
     "ts-node": "^10.9.2",
     "tsc": "^2.0.4",
     "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
     "tslib": "^2.6.2",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.5"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "volta": {
+    "node": "20.12.1",
+    "npm": "10.5.0"
   }
 }

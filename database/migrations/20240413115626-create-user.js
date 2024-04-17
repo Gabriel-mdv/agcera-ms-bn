@@ -1,4 +1,3 @@
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -11,68 +10,67 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
       },
       name: {
+        type: Sequelize.STRING,
         allowNull: false,
-        type: Sequelize.STRING
       },
       password: {
+        type: Sequelize.STRING,
         allowNull: false,
-        type: Sequelize.STRING
+        validate: {
+          min: 4,
+        },
       },
       email: {
         type: Sequelize.STRING,
-        unique: true
-      },
-      gender: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        defaultValue: 'unspecified'
-      },
-  
-      location: {
-        type: Sequelize.STRING,
-        allowNull:false,
-        defaultValue: 'Maputo Center'
+        allowNull: true,
+        unique: true,
+        validate: {
+          isEmail: true,
+        },
       },
       phone: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true
+        unique: true,
       },
-      role: {
+      gender: {
+        type: Sequelize.ENUM('MALE', 'FEMALE', 'UNSPECIFIED'),
+        allowNull: false,
+        defaultValue: 'UNSPECIFIED',
+      },
+      location: {
         type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: "user",
+        defaultValue: 'Maputo Center',
+      },
+      role: {
+        type: Sequelize.ENUM('admin', 'keeper', 'user'),
+        allowNull: false,
+        defaultValue: 'user',
       },
       storeId: {
         type: Sequelize.UUID,
-        allowNull: true,
+        allowNull: false,
         references: {
           model: 'Stores',
-          key: 'id'
-        }
+          key: 'id',
+        },
       },
       isActive: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: true,
       },
-
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: new Date(),
       },
-      updatedAt: {
-        type: Sequelize.DATE
-      },
-      deletedAt: {
-        type: Sequelize.DATE
-      },
-  
-
-
-    });
+      updatedAt: Sequelize.DATE,
+      deletedAt: Sequelize.DATE,
+    })
   },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users', null, {});
-  }
-};
+  async down(queryInterface) {
+    await queryInterface.dropTable('Users')
+  },
+}

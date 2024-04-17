@@ -14,7 +14,6 @@ build/
 *.js.map
 
 # Ignore editor and IDE files
-.vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace

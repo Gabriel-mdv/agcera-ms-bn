@@ -1,366 +1,430 @@
-import { Request, Response} from 'express';
-import bcrypt from 'bcrypt';
-import {userRegisterSchema, userLoginSchema, phoneSchema, userUpdateSchema} from '../validation/user.validation';
-import { generateToken, verifyToken } from '../utils/jwtFunctions';
-import { UniqueConstraintError } from 'sequelize';
-import sendEmail from '../utils/sendEmail';
-import { decode } from 'punycode';
-import User from '@database/models/user';
-import userService from '../services/user.services';
+import { Request, Response } from 'express'
+import bcrypt from 'bcrypt'
+import { userRegisterSchema, userLoginSchema, userUpdateSchema, emailSchema } from '../validation/user.validation'
+import { generateToken, verifyToken } from '../utils/jwtFunctions'
+import { Op, WhereOptions } from 'sequelize'
+import sendEmail from '../utils/sendEmail'
+import userService from '../services/user.services'
+import StoreServices from '@src/services/store.services'
+import { RequestWithUser } from '@src/types/common.types'
+import { validateUUIDV4 } from '@src/validation/common.validation'
 
 class UsersController {
+  static async register(req: Request, res: Response): Promise<Response> {
+    try {
+      //  validate the body using joi
+      const { error, value } = userRegisterSchema.validate(req.body)
 
-    static async register(req: Request, res: Response): Promise<Response | undefined> {
-        try {
+      if (error) {
+        return res.status(400).json({
+          status: 'fail',
+          message: error.message,
+        })
+      }
 
-            //  validate the body using joi
-            const { error, value } = userRegisterSchema.validate(req.body);
+      const { name, email, phone, password, storeId, gender, location, role } = value
 
-            if (error) {
-                return res.status(400).json({
-                    status: 'fail',
-                    message: error.message
-                });
-            }
-
-            const {name , email, phone, password, storeId} = value;
-            const {gender, location, role} = req.body;
-
-            // hash the password
-            const hashedPassword = await bcrypt.hash(password, bcrypt.genSaltSync(10))
-
-            // check if the user already exists
-            const newUser = await userService.registerUser(name, hashedPassword, email, phone,gender, location, storeId, role);
-
-            if(!newUser) {
-                return res.status(400).json({
-                    status: 'fail',
-                    message: 'Failed to create user'
-
-                })
-            }
-
-            // generate token for the user
-            const token = generateToken({id: newUser.id, role: newUser.role});
-            // store the token in the cookies
-            res.cookie('AuthToken', token, {httpOnly: true, secure: true, sameSite: 'none'});
-
-            // return the new user
-            return res.status(200).json({
-                status: 'success',
-                data: newUser
-            });
-
-        } catch (e:any) {
-            if(e instanceof UniqueConstraintError) {
-                return res.status(400).json({
-                    status: 'fail',
-                    message: 'User already exists'
-                });
-                }
-             else if(e.name === 'SequelizeForeignKeyConstraintError') {
-                    return res.status(400).json({
-                        status: 'fail',
-                        message: 'Invalid storeId. No Store found with the provided storeId.'
-                    });
-             }
-            else{
-            return res.status(500).json({
-                status: 'fail',
-                message: e.message
-            });
-         }
+      // Check if user already exists and was not deleted before
+      const user = await userService.getOneUser({ [Op.or]: [{ email }, { phone }] })
+      if (user && user.deletedAt === null) {
+        let message = ''
+        if (user.email === email) {
+          message = 'Another user with this email already exists.'
+        } else if (user.phone === phone) {
+          message = 'Another user with this phone number already exists.'
         }
+
+        return res.status(400).json({
+          status: 'fail',
+          message,
+        })
+      }
+
+      // Check store exists
+      const store = await StoreServices.getStoreById(storeId)
+      if (!store) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'No Store found with the provided storeId.',
+        })
+      }
+
+      // hash the password
+      const hashedPassword = await bcrypt.hash(password, bcrypt.genSaltSync(10))
+
+      // check if the user already exists
+      const newUser = await userService.registerUser(
+        name,
+        hashedPassword,
+        email,
+        phone,
+        gender,
+        location,
+        storeId,
+        role
+      )
+
+      // generate token for the user
+      const token = generateToken({ id: newUser.id, role: newUser.role })
+      // store the token in the cookies
+      res.cookie('AuthToken', token, { httpOnly: true, secure: true, sameSite: 'none' })
+
+      // return the new user
+      return res.status(200).json({
+        status: 'success',
+        data: newUser,
+      })
+    } catch (e: any) {
+      console.log('Unexpected Error ===> ', e)
+      return res.status(500).json({
+        status: 'fail',
+        message: 'An unexpected error occured, please try again later.',
+      })
     }
+  }
 
-    // login the user
-    static async Login(req: Request, res: Response): Promise<Response | undefined> {
-        try {
+  // login the user
+  static async Login(req: Request, res: Response): Promise<Response | undefined> {
+    try {
+      // validate the body using joi
+      const { error, value } = userLoginSchema.validate(req.body)
 
-            // validate the body using joi
-            const {error, value} = userLoginSchema.validate(req.body);
+      if (error) {
+        return res.status(400).json({
+          status: 'fail',
+          message: error.message,
+        })
+      }
 
-            if(error){
-                return res.status(400).json({
-                    status: 'fail',
-                    message: error.message
-                });
-            }
+      const { phone, password } = value
 
-            const {phone, password} = value;
+      // check if the user exists and login the user
+      const user = await userService.loginUser(phone)
 
-            // check if the user exists and login the user
-            const user = await userService.loginUser(phone);
+      if (!user) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'Invalid credentials',
+        })
+      }
 
-            if(!user){
-                return res.status(404).json({
-                    status: 'fail',
-                    message: 'User not found'
-                });
-            }
+      // compare the password using bcrypt
+      const isMatch = await bcrypt.compare(password, user.password)
 
-            // compare the password using bcrypt
-            const isMatch = await bcrypt.compare(password, user.password as string)
+      if (!isMatch) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'Invalid credentials',
+        })
+      }
 
-            if(!isMatch){
-                return res.status(400).json({
-                    status: 'fail',
-                    message: 'Invalid credentials'
-                });
-            }
+      // generate the toke for the user
+      const token = generateToken({ id: user.id, role: user.role })
+      // store the token in the cookies
+      res.cookie('AuthToken', token, { httpOnly: true, secure: true, sameSite: 'none' })
 
-            // generate the toke for the user
-            const token = generateToken({id: user.id, role: user.role});
-            // store the token in the cookies
-            res.cookie('AuthToken', token, {httpOnly: true, secure: true, sameSite: 'none'});
+      delete (user.dataValues as { [key: string]: any }).password
 
-            delete (user.dataValues as {[key: string]: any}).password;
-
-            return res.status(200).json({
-                status: 'success',
-                data: user
-            })
-        }
-
-        catch(e: any){
-            return res.status(500).json({
-                status: 'fail',
-                message: e.message
-            })
-        }
+      return res.status(200).json({
+        status: 'success',
+        data: user,
+      })
+    } catch (e: any) {
+      console.log('Unexpected Error ===> ', e)
+      return res.status(500).json({
+        status: 'fail',
+        message: 'An unexpected error occured, please try again later.',
+      })
     }
+  }
 
+  // logout the user
+  static async Logout(req: Request, res: Response): Promise<Response> {
+    try {
+      // clear the cookies
+      res.clearCookie('AuthToken')
 
-    // logout the user
-    static async Logout(req: Request, res: Response): Promise<Response | undefined> {
-        try {
-
-            // clear the cookies
-            res.clearCookie('AuthToken');
-
-            return res.status(200).json({
-                status: 'success',
-                message: 'Logged out successfully'
-            });
-
-        } catch (e: any) {
-            return res.status(500).json({
-                status: 'fail',
-                message: e.message
-            });
-        }
+      return res.status(200).json({
+        status: 'success',
+        message: 'Logged out successfully',
+      })
+    } catch (e: any) {
+      console.log('Unexpected Error ===> ', e)
+      return res.status(500).json({
+        status: 'fail',
+        message: 'An unexpected error occured, please try again later.',
+      })
     }
+  }
 
+  // forgot password
+  static async ForgotPasword(req: Request, res: Response): Promise<Response> {
+    try {
+      // validate the phone number
+      const { error } = emailSchema.validate(req.body)
 
-    // forgot password
-    static async ForgotPasword(req: Request, res: Response): Promise<Response | undefined> {
-        try {
-            // validate the phone number
-            const {error, value} = phoneSchema.validate(req.body);
+      const email = req.body.email
 
-            const phone = value.phone
+      if (error) {
+        return res.status(400).json({
+          status: 'fail',
+          message: error.message,
+        })
+      }
 
-            if (error) {
-                return res.status(400).json({
-                    status: 'fail',
-                    message:error.message
-                });
-            }
+      // check the user exists
+      const user = await userService.getOneUser({ email })
 
-            // check if the user exists
-            const user = await userService.loginUser(phone);
-            if(!user){
-                return res.status(404).json({
-                    status: 'fail',
-                    message: 'User not found'
-                });
-            }
+      if (!user) {
+        return res.status(404).json({
+          status: 'fail',
+          message: 'User with the provided email not found',
+        })
+      }
 
-            // generate the token
-            const token = generateToken({id: user.id});
+      // generate the token
+      const token = generateToken({ id: user.id })
 
-            // check if the use has email
-            if(! user.email){
-                return res.status(400).json({
-                    status: 'fail',
-                    message: 'Please contact the admin to reset your password'
-                });
-            }
+      // send the token to the user's email
+      await sendEmail(
+        email,
+        'Password Reset',
+        `Please follow the link to reset the password http://localhost:4000/api/v1/users/reset/${token}, the token expires in 24 hours.`
+      )
 
-            // send the token to the user's email
-            const sent_mail = await sendEmail(user.email as string, 'Password Reset',
-            `Please follow the link to reset the password http://localhost:4000/api/v1/users/reset/${token}`);
-
-            if(!sent_mail){
-                return res.status(500).json({
-                    status: 'fail',
-                    message: 'Failed to send the email with token. Please try again!'
-                });
-            }
-
-            // send the token to the user's phone number
-            return res.status(200).json({
-                status: 'success',
-                message: 'Token sent to your Email'
-            });
-
-        } catch (e: any) {
-            return res.status(500).json({
-                status: 'fail',
-                message: e.message
-            });
-        }
+      // send the token to the user's phone number
+      return res.status(200).json({
+        status: 'success',
+        message: 'An email with instructions to reset your password has been sent to your email.',
+      })
+    } catch (e: any) {
+      console.log('Unexpected Error ===> ', e)
+      return res.status(500).json({
+        status: 'fail',
+        message: 'An unexpected error occured, please try again later.',
+      })
     }
+  }
 
-    // reset password
-    static async resetPassword (req: Request, res: Response): Promise<Response | undefined> {
-        try{
-            // get the token from  params
-            const { token } = req.params;
+  // reset password
+  static async resetPassword(req: Request, res: Response): Promise<Response> {
+    try {
+      // get the token from  params
+      const { token } = req.params
+      const password = req.body.password
 
-            // verify the token
-            const decoded_token = verifyToken(token);
-            if(!decoded_token){
-                return res.status(400).json({
-                    status: 'fail',
-                    message: 'Invalid token'
-                });
-            }
+      // verify the token
+      const decoded_token = verifyToken(token)
+      if (!decoded_token) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'Invalid token',
+        })
+      }
 
-            const {id} = decoded_token as {[key: string]: any};
+      const { id }: { [key: string]: any } = decoded_token
 
-            // get the user using the id
-            const user = await userService.getUserById(id);
+      // get the user using the id
+      const user = await userService.getUserById(id)
 
-            console.log(user)
+      if (!user) {
+        return res.status(404).json({
+          status: 'fail',
+          message: 'User assigned to this token not found',
+        })
+      }
 
-            if(!user){
-                return res.status(404).json({
-                    status: 'fail',
-                    message: 'User not found'
-                });
-            }
+      // hash the new password
+      if (!password) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'New Password is required',
+        })
+      }
 
-            // hash the new password
-            if(!req.body.password){
-                return res.status(400).json({
-                    status: 'fail',
-                    message: 'New Password is required'
-                });
-            }
+      const hashedPassword = await bcrypt.hash(password, bcrypt.genSaltSync(10))
 
-            const hashedPassword = await bcrypt.hash(req.body.password, bcrypt.genSaltSync(10));
+      // update the password
+      user.password = hashedPassword
+      await user.save()
 
-            // update the password
-            user.password = hashedPassword;
-            await user.save();
-
-            return res.status(200).json({
-                status: 'success',
-                message: 'Password reset successfully'
-            });
-
-        }
-        catch(e: any){
-            return res.status(500).json({
-                status: 'fail',
-                message: e.message
-            });
-        }
+      return res.status(200).json({
+        status: 'success',
+        message: 'Password reset successfully',
+      })
+    } catch (e: any) {
+      console.log('Unexpected Error ===> ', e)
+      return res.status(500).json({
+        status: 'fail',
+        message: 'An unexpected error occured, please try again later.',
+      })
     }
+  }
 
-    // get all users
-    static async getAllUsers(req: Request, res: Response): Promise<Response | undefined> {
-        try {
-            const users = await userService.getAllUsers();
+  // get all users
+  static async getAllUsers(req: RequestWithUser, res: Response): Promise<Response> {
+    try {
+      const user = req.user!
 
-            return res.status(200).json({
-                status: 'success',
-                data: users
-            });
+      const where: WhereOptions = {}
 
-        } catch (e: any) {
-            return res.status(500).json({
-                status: 'fail',
-                message: e.message
-            });
-        }
+      if (user.role === 'keeper') {
+        where['storeId'] = user.storeId
+      }
+
+      const users = await userService.getAllUsers({ where })
+
+      return res.status(200).json({
+        status: 'success',
+        data: users,
+      })
+    } catch (e: any) {
+      console.log('Unexpected Error ===> ', e)
+      return res.status(500).json({
+        status: 'fail',
+        message: 'An unexpected error occured, please try again later.',
+      })
     }
+  }
 
-    // get single user profile
-    static async getSingleUser(req: Request, res: Response): Promise<Response | undefined> {
-        try {
-            const {id} = req.params;
+  // get single user profile
+  static async getSingleUser(req: RequestWithUser, res: Response): Promise<Response> {
+    try {
+      const user = req.user!
+      const { id } = req.params
 
-            const user = await userService.getUserById(id);
+      const { error } = validateUUIDV4(id)
+      if (error) {
+        return res.status(400).json({
+          status: 'fail',
+          message: error.message,
+        })
+      }
 
-            if(!user){
-                return res.status(404).json({
-                    status: 'fail',
-                    message: 'User not found'
-                });
-            }
+      const foundUser = await userService.getUserById(id)
 
-            return res.status(200).json({
-                status: 'success',
-                data: user
-            });
+      if (user.role === 'user' && user.id !== id) {
+        return res.status(403).json({
+          status: 'fail',
+          message: 'You can only request your account',
+        })
+      } else if (user.role === 'keeper' && user.storeId !== foundUser?.storeId) {
+        return res.status(403).json({
+          status: 'fail',
+          message: 'You are not authorized to view this user account or user does not exist',
+        })
+      }
 
-        } catch (e: any) {
-            return res.status(500).json({
-                status: 'fail',
-                message: e.message
-            });
-        }
+      if (!foundUser) {
+        return res.status(404).json({
+          status: 'fail',
+          message: 'User not found',
+        })
+      }
+
+      return res.status(200).json({
+        status: 'success',
+        data: foundUser,
+      })
+    } catch (e: any) {
+      console.log('Unexpected Error ===> ', e)
+      return res.status(500).json({
+        status: 'fail',
+        message: 'An unexpected error occured, please try again later.',
+      })
     }
+  }
 
-    // update user profile
-    static async updateUser(req: Request, res: Response): Promise<Response | undefined> {
-        try {
-            const {id} = req.params;
-            
-            const user = await userService.getUserById(id);
-            if(!user){
-                return res.status(404).json({
-                    status: 'fail',
-                    message: 'User not found'
-                });
-            }
+  // update user profile
+  static async updateUser(req: Request, res: Response): Promise<Response | undefined> {
+    try {
+      const { id } = req.params
 
-            // update the user
-            const {error, value} = userUpdateSchema.validate(req.body);     
-            if(error){
-                return res.status(400).json({
-                    status: 'fail',
-                    message: error.message
-                });
-            }
+      const user = await userService.getUserById(id)
+      if (!user) {
+        return res.status(404).json({
+          status: 'fail',
+          message: 'User not found',
+        })
+      }
 
-            const {name, email, phone, storeId} = value;
+      // update the user
+      const { error, value } = userUpdateSchema.validate(req.body)
+      if (error) {
+        return res.status(400).json({
+          status: 'fail',
+          message: error.message,
+        })
+      }
 
-            name ? user.name = name : null;
-            email ? user.email = email : null;
-            phone ? user.phone = phone : null;
-            storeId ? user.storeId = storeId : null;
+      const { name, email, phone, storeId } = value
 
-            await user.save();
+      name ? (user.name = name) : null
+      email ? (user.email = email) : null
+      phone ? (user.phone = phone) : null
+      storeId ? (user.storeId = storeId) : null
 
-            delete (user.dataValues as {[key: string]: any}).password;
+      await user.save()
 
-            return res.status(200).json({
-                status: 'success',
-                data: user
-            });
+      delete (user.dataValues as { [key: string]: any }).password
 
-        }
-        catch(e: any){
-            return res.status(500).json({
-                status: 'fail',
-                message: e.message
-            });
-        }
+      return res.status(200).json({
+        status: 'success',
+        data: user,
+      })
+    } catch (e: any) {
+      console.log('Unexpected Error ===> ', e)
+      return res.status(500).json({
+        status: 'fail',
+        message: 'An unexpected error occured, please try again later.',
+      })
     }
+  }
+
+  // delete user
+  static async deleteUser(req: RequestWithUser, res: Response): Promise<Response> {
+    try {
+      const user = req.user!
+      const { id } = req.params
+
+      const { error } = validateUUIDV4(id)
+      if (error) {
+        return res.status(400).json({
+          status: 'fail',
+          message: error.message,
+        })
+      }
+
+      if (user.id === id) {
+        return res.status(403).json({
+          status: 'fail',
+          message: 'You cannot delete yourself, ask another admin to delete your account',
+        })
+      }
+
+      const foundUser = await userService.getUserById(id)
+      if (!foundUser) {
+        return res.status(404).json({
+          status: 'fail',
+          message: 'User not found',
+        })
+      }
+
+      // delete the user
+      await foundUser.destroy()
+
+      return res.status(200).json({
+        status: 'success',
+        message: 'User deleted successfully',
+      })
+    } catch (e: any) {
+      console.log('Unexpected Error ===> ', e)
+      return res.status(500).json({
+        status: 'fail',
+        message: 'An unexpected error occured, please try again later.',
+      })
+    }
+  }
 }
 
-
-export default UsersController;
+export default UsersController

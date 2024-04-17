@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -11,34 +11,34 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
       },
       name: {
+        unique: true,
         type: Sequelize.STRING,
-        unique: true
+        allowNull: false,
       },
       location: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       phone: {
-        type: Sequelize.STRING
+        unique: true,
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      isOpen: {
+      isActive: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true
+        defaultValue: true,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: new Date(),
       },
-      updatedAt: {
-        allowNull: true,
-        type: Sequelize.DATE
-      },
-      deletedAt: {
-        allowNull: true,
-        type: Sequelize.DATE
-      }
-    });
+      updatedAt: Sequelize.DATE,
+      deletedAt: Sequelize.DATE,
+    })
   },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Stores');
-  }
-};
+  async down(queryInterface) {
+    await queryInterface.dropTable('Stores')
+  },
+}
