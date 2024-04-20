@@ -11,4 +11,8 @@ router.post('/', upload.single('image'), isAdmin, ProductsController.createNewPr
 router.patch('/:id', upload.single('image'), isStoreKeeperUp, ProductsController.updateProduct);
 router.delete('/:id', isAdmin, ProductsController.deleteProduct);
 
+// Variations related routes
+
+// router.get("/:id/variations", isLoggedIn);
+
 export default router;
