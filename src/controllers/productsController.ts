@@ -7,10 +7,11 @@ import { handleDeleteUpload, handleUpload } from '@src/utils/cloudinary';
 import { UploadApiErrorResponse } from 'cloudinary';
 import { Request, Response } from 'express';
 import { IncludeOptions, Op } from 'sequelize';
+import { BaseController } from '.';
 
-export default class ProductsController {
+export default class ProductsController extends BaseController {
   // get all products
-  static async getAllProducts(req: ExtendedRequest, res: Response): Promise<Response> {
+  async getAllProducts(req: ExtendedRequest, res: Response): Promise<Response> {
     const { search, limit, skip, sort } = req.query;
 
     const { products, total } = await ProductServices.getAllProducts({ search, limit, skip, sort });
@@ -22,7 +23,7 @@ export default class ProductsController {
   }
 
   // get one product
-  static async getOneProduct(req: ExtendedRequest, res: Response): Promise<Response> {
+  async getOneProduct(req: ExtendedRequest, res: Response): Promise<Response> {
     const { role: userRole, id: userId } = req.user!;
     const { id } = req.params;
 
@@ -66,7 +67,7 @@ export default class ProductsController {
   }
 
   // Create product
-  static async createNewProduct(req: Request, res: Response): Promise<Response> {
+  async createNewProduct(req: Request, res: Response): Promise<Response> {
     const { name, type, description, variations } = req.body;
 
     // Restrict standard products to have only one variation
@@ -114,38 +115,11 @@ export default class ProductsController {
   }
 
   // update product
-  static async updateProduct(req: ExtendedRequest, res: Response): Promise<Response> {
-    const user = req.user!;
+  async updateProduct(req: ExtendedRequest, res: Response): Promise<Response> {
     const { id } = req.params;
     const { name, variations } = req.body;
 
-    const include: IncludeOptions[] = [
-      {
-        association: 'stores',
-        required: true,
-        include: [
-          {
-            association: 'store',
-            required: true,
-            include: [
-              {
-                association: 'users',
-                where: { id: user.id },
-                required: true,
-              },
-            ],
-          },
-        ],
-      },
-    ];
-    const previousProduct = await ProductServices.getOneProduct({ id }, include);
-    // check permission of the user for the action
-    if (user.role !== UserRolesEnum.ADMIN && !previousProduct) {
-      return res.status(403).json({
-        status: 'fail',
-        message: 'You are not allowed to perform this action or the product does not exist',
-      });
-    }
+    const previousProduct = await ProductServices.getOneProduct({ id });
     if (!previousProduct) {
       return res.status(404).json({
         status: 'fail',
@@ -206,7 +180,7 @@ export default class ProductsController {
   }
 
   // delete product
-  static async deleteProduct(req: Request, res: Response): Promise<Response> {
+  async deleteProduct(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
 
     const product = await ProductServices.getProductByPk(id);
@@ -222,6 +196,47 @@ export default class ProductsController {
     return res.status(201).json({
       status: 'success',
       data: 'Product deleted successfully',
+    });
+  }
+
+  // get all variations of a product
+  async getAllVariations(req: ExtendedRequest, res: Response): Promise<Response> {
+    const { productId } = req.params;
+
+    const variations = await VariationServices.getAllVariations(productId);
+
+    return res.status(200).json({
+      status: 'success',
+      data: variations,
+    });
+  }
+
+  // delete variation
+  async deleteVariation(req: ExtendedRequest, res: Response): Promise<Response> {
+    const { id } = req.params;
+    const product = req.product!;
+
+    const variations = product['variations']!;
+    const variation = variations.find((v) => v.id === id);
+
+    if (!variation) {
+      return res.status(404).json({
+        status: 'fail',
+        message: `variation with id ${id}, not found`,
+      });
+    }
+    if (variations.length <= 1) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Product should have atleast one variation',
+      });
+    }
+
+    await variation.destroy();
+
+    return res.status(200).json({
+      status: 'success',
+      data: 'Variation deleted successfully',
     });
   }
 }

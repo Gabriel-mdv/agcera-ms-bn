@@ -28,4 +28,9 @@ export default class VariationServices {
 
     return variation;
   }
+
+  // Get all variations of a product
+  static async getAllVariations(productId: string): Promise<Variation[]> {
+    return Variation.findAll({ where: { productId } });
+  }
 }

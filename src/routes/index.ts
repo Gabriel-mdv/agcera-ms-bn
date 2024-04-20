@@ -1,14 +1,14 @@
-import { validateParams, validateQueries } from '@src/validation/common.validation';
 import { Router } from 'express';
 import productsRoutes from './productsRoutes';
 import salesRoutes from './salesRoutes';
 import storesRoutes from './storesRoutes';
 import usersRoute from './usersRoute';
+import { validateQueries } from '@src/middlewares/validation';
 
 const router = Router();
 
 // Register the always used middlewares
-router.use(validateParams, validateQueries);
+router.use(validateQueries);
 
 router.use('/users', usersRoute);
 router.use('/stores', storesRoutes);

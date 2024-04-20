@@ -6,9 +6,10 @@ import { Op, WhereOptions } from 'sequelize';
 import userService from '../services/user.services';
 import { generateToken, verifyToken } from '../utils/jwtFunctions';
 import sendEmail from '../utils/sendEmail';
+import { BaseController } from '.';
 
-class UsersController {
-  static async register(req: Request, res: Response): Promise<Response> {
+class UsersController extends BaseController {
+  async register(req: Request, res: Response): Promise<Response> {
     const { name, email, phone, password, storeId, gender, location, role } = req.body;
 
     // Check if user already exists and was not deleted before
@@ -55,7 +56,7 @@ class UsersController {
   }
 
   // login the user
-  static async Login(req: Request, res: Response): Promise<Response> {
+  async Login(req: Request, res: Response): Promise<Response> {
     const { phone, password } = req.body;
 
     // check if the user exists and login the user
@@ -92,7 +93,7 @@ class UsersController {
   }
 
   // logout the user
-  static async Logout(req: Request, res: Response): Promise<Response> {
+  async Logout(req: Request, res: Response): Promise<Response> {
     res.clearCookie('AuthToken');
 
     return res.status(200).json({
@@ -102,7 +103,7 @@ class UsersController {
   }
 
   // forgot password
-  static async ForgotPasword(req: Request, res: Response): Promise<Response> {
+  async ForgotPasword(req: Request, res: Response): Promise<Response> {
     const email = req.body.email;
 
     // check the user exists
@@ -133,7 +134,7 @@ class UsersController {
   }
 
   // reset password
-  static async resetPassword(req: Request, res: Response): Promise<Response> {
+  async resetPassword(req: Request, res: Response): Promise<Response> {
     // get the token from  params
     const { token } = req.params;
     const password = req.body.password;
@@ -180,7 +181,7 @@ class UsersController {
   }
 
   // get all users
-  static async getAllUsers(req: ExtendedRequest, res: Response): Promise<Response> {
+  async getAllUsers(req: ExtendedRequest, res: Response): Promise<Response> {
     const user = req.user!;
     const { search, limit, skip, sort } = req.query;
 
@@ -198,7 +199,7 @@ class UsersController {
   }
 
   // get single user profile
-  static async getSingleUser(req: ExtendedRequest, res: Response): Promise<Response> {
+  async getSingleUser(req: ExtendedRequest, res: Response): Promise<Response> {
     const user = req.user!;
     const { id } = req.params;
 
@@ -230,7 +231,7 @@ class UsersController {
   }
 
   // update user profile
-  static async updateUser(req: Request, res: Response): Promise<Response> {
+  async updateUser(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
 
     const user = await userService.getUserById(id);
@@ -259,7 +260,7 @@ class UsersController {
   }
 
   // delete user
-  static async deleteUser(req: ExtendedRequest, res: Response): Promise<Response> {
+  async deleteUser(req: ExtendedRequest, res: Response): Promise<Response> {
     const user = req.user!;
     const { id } = req.params;
 

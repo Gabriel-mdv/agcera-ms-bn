@@ -2,9 +2,10 @@ import StoreServices from '@src/services/store.services';
 import { ExtendedRequest } from '@src/types/common.types';
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
+import { BaseController } from '.';
 
-class storesController {
-  static async createStore(req: Request, res: Response): Promise<Response> {
+class storesController extends BaseController {
+  async createStore(req: Request, res: Response): Promise<Response> {
     const { name, location, phone, isActive } = req.body;
 
     const store = await StoreServices.getOneStore({ [Op.or]: [{ name }, { phone }] });
@@ -31,7 +32,7 @@ class storesController {
   }
 
   // get all shops
-  static async getStores(req: ExtendedRequest, res: Response): Promise<Response> {
+  async getStores(req: ExtendedRequest, res: Response): Promise<Response> {
     const user = req.user!;
     const { search, limit, skip, sort } = req.query;
 
@@ -51,7 +52,7 @@ class storesController {
   }
 
   // get a single shop
-  static async singleStore(req: ExtendedRequest, res: Response): Promise<Response> {
+  async singleStore(req: ExtendedRequest, res: Response): Promise<Response> {
     const { role, id: userId } = req.user!;
     const { id } = req.params;
 
@@ -79,7 +80,7 @@ class storesController {
   }
 
   // update store
-  static async updateStore(req: ExtendedRequest, res: Response): Promise<Response> {
+  async updateStore(req: ExtendedRequest, res: Response): Promise<Response> {
     const { id: userId, role: userRole } = req.user!;
     const { id } = req.params;
     const { name, location, phone, isActive } = req.body;
@@ -146,7 +147,7 @@ class storesController {
   }
 
   // delete store
-  static async deleteStore(req: Request, res: Response): Promise<Response> {
+  async deleteStore(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
 
     const store = await StoreServices.getStoreById(id);

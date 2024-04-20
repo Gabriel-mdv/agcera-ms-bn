@@ -1,32 +1,47 @@
 import ProductsController from '@src/controllers/productsController';
-import { isAdmin, isLoggedIn, isStoreKeeperUp } from '@src/middlewares/checkAuth';
+import { isAdmin, isLoggedIn } from '@src/middlewares/checkAuth';
 import upload from '@src/middlewares/multer';
-import { validate } from '@src/middlewares/validation';
+import { validate, validateParams, validateProductExist } from '@src/middlewares/validation';
 import { createNewProductSchema, updateProductSchema } from '@src/validation/products.validation';
 import { Router } from 'express';
 
 const router = Router();
+const productsController = new ProductsController();
 
-router.get('/', isLoggedIn, ProductsController.getAllProducts);
-router.get('/:id', isLoggedIn, ProductsController.getOneProduct);
+router.get('/', isLoggedIn, productsController.getAllProducts);
+router.get('/:id', isLoggedIn, validateParams(), productsController.getOneProduct);
 router.post(
   '/',
   isAdmin,
   validate(createNewProductSchema),
   upload.single('image'),
-  ProductsController.createNewProduct
+  productsController.createNewProduct
 );
 router.patch(
   '/:id',
-  isStoreKeeperUp,
+  isAdmin,
   upload.single('image'),
+  validateParams(),
   validate(updateProductSchema),
-  ProductsController.updateProduct
+  productsController.updateProduct
 );
-router.delete('/:id', isAdmin, ProductsController.deleteProduct);
+router.delete('/:id', isAdmin, validateParams(), productsController.deleteProduct);
 
 // Variations related routes
 
-// router.get("/:id/variations", isLoggedIn);
+router.get(
+  '/:productId/variations',
+  isLoggedIn,
+  validateParams(['productId']),
+  validateProductExist,
+  productsController.getAllVariations
+);
+router.delete(
+  '/:productId/variations/:id',
+  isAdmin,
+  validateParams(['productId', 'id']),
+  validateProductExist,
+  productsController.deleteVariation
+);
 
 export default router;
