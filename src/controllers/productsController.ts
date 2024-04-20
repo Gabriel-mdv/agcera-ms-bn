@@ -4,7 +4,6 @@ import { ExtendedRequest } from '@src/types/common.types';
 import { ProductTypesEnum } from '@src/types/product.types';
 import { UserRolesEnum } from '@src/types/user.types';
 import { handleDeleteUpload, handleUpload } from '@src/utils/cloudinary';
-import { validateCreateNewProduct, validateUpdateProduct } from '@src/validation/products.validation';
 import { UploadApiErrorResponse } from 'cloudinary';
 import { Request, Response } from 'express';
 import { IncludeOptions, Op } from 'sequelize';
@@ -68,15 +67,7 @@ export default class ProductsController {
 
   // Create product
   static async createNewProduct(req: Request, res: Response): Promise<Response> {
-    // validate the request body
-    const { error, value } = validateCreateNewProduct(req.body);
-    if (error) {
-      return res.status(400).json({
-        status: 'fail',
-        message: error.message,
-      });
-    }
-    const { name, type, description, variations } = value;
+    const { name, type, description, variations } = req.body;
 
     // Restrict standard products to have only one variation
     if (type === ProductTypesEnum.STANDARD && variations.length > 1) {
@@ -126,15 +117,7 @@ export default class ProductsController {
   static async updateProduct(req: ExtendedRequest, res: Response): Promise<Response> {
     const user = req.user!;
     const { id } = req.params;
-
-    const { error, value } = validateUpdateProduct(req.body);
-    if (error) {
-      return res.status(400).json({
-        status: 'fail',
-        message: error.message,
-      });
-    }
-    const { name, variations } = value;
+    const { name, variations } = req.body;
 
     const include: IncludeOptions[] = [
       {
@@ -202,7 +185,7 @@ export default class ProductsController {
     }
 
     // update the product
-    const product = await ProductServices.updateProduct(id, { ...value, image: url });
+    const product = await ProductServices.updateProduct(id, { ...req.body, image: url });
     // delete the old image on cloud
     if (url)
       // No need to bother catching the error as the image is already updated
