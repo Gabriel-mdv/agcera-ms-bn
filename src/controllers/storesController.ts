@@ -2,20 +2,10 @@ import StoreServices from '@src/services/store.services';
 import { ExtendedRequest } from '@src/types/common.types';
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { storeRegisterSchema, storeUpdateSchema } from '../validation/store.validation';
 
 class storesController {
   static async createStore(req: Request, res: Response): Promise<Response> {
-    const { error, value } = storeRegisterSchema.validate(req.body);
-
-    if (error) {
-      return res.status(400).json({
-        status: 'fail',
-        message: error.message,
-      });
-    }
-
-    const { name, location, phone, isActive } = value;
+    const { name, location, phone, isActive } = req.body;
 
     const store = await StoreServices.getOneStore({ [Op.or]: [{ name }, { phone }] });
 
@@ -91,19 +81,8 @@ class storesController {
   // update store
   static async updateStore(req: ExtendedRequest, res: Response): Promise<Response> {
     const { id: userId, role: userRole } = req.user!;
-
-    // Validate the param id
     const { id } = req.params;
-
-    // validate the update request body
-    const { error, value } = storeUpdateSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({
-        status: 'fail',
-        message: error.message,
-      });
-    }
-    const { name, location, phone, isActive } = value;
+    const { name, location, phone, isActive } = req.body;
 
     // get the to be updated store
     const store = await StoreServices.getStoreById(id);
