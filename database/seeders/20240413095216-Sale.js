@@ -14,9 +14,9 @@ module.exports = {
         },
       ],
       {}
-    )
+    );
   },
   async down(queryInterface) {
-    await queryInterface.bulkDelete('Sales', null, {})
+    await queryInterface.bulkDelete('Sales', null, {});
   },
-}
+};

@@ -1,4 +1,4 @@
-import sequelize from '@database/connection'
+import sequelize from '@database/connection';
 import {
   CreationOptional,
   DataTypes,
@@ -7,28 +7,28 @@ import {
   type Association,
   type InferAttributes,
   type InferCreationAttributes,
-} from 'sequelize'
-import StoreProduct from './storeproduct'
-import User from './user'
+} from 'sequelize';
+import StoreProduct from './storeproduct';
+import User from './user';
 
 class Store extends Model<InferAttributes<Store>, InferCreationAttributes<Store>> {
-  declare id: CreationOptional<string>
-  declare name: string
-  declare phone: string
-  declare location: string
-  declare isActive: boolean | null
+  declare id: CreationOptional<string>;
+  declare name: string;
+  declare phone: string;
+  declare location: string;
+  declare isActive: boolean | null;
 
-  declare readonly createdAt: CreationOptional<Date>
-  declare updatedAt: Date | null
-  declare deletedAt: Date | null
+  declare readonly createdAt: CreationOptional<Date>;
+  declare updatedAt: Date | null;
+  declare deletedAt: Date | null;
 
-  declare users?: NonAttribute<User[]>
-  declare products?: NonAttribute<StoreProduct[]>
+  declare users?: NonAttribute<User[]>;
+  declare products?: NonAttribute<StoreProduct[]>;
 
   declare static associations: {
-    users: Association<User, Store>
-    products: Association<StoreProduct, Store>
-  }
+    users: Association<User, Store>;
+    products: Association<StoreProduct, Store>;
+  };
 }
 
 Store.init(
@@ -73,27 +73,27 @@ Store.init(
     tableName: 'Stores',
     paranoid: true,
   }
-)
+);
 
 StoreProduct.belongsTo(Store, {
   foreignKey: 'storeId',
   as: 'store',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
-})
+});
 Store.hasMany(StoreProduct, {
   foreignKey: 'storeId',
   as: 'products',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
-})
+});
 
 Store.hasMany(User, {
   foreignKey: 'storeId',
   as: 'users',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
-})
-User.belongsTo(Store, { foreignKey: 'storeId', as: 'store' })
+});
+User.belongsTo(Store, { foreignKey: 'storeId', as: 'store' });
 
-export default Store
+export default Store;

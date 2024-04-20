@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 
 module.exports = {
   development: {
@@ -15,4 +15,4 @@ module.exports = {
     host: process.env.PROD_DB_HOST || '127.0.0.1',
     dialect: 'postgres',
   },
-}
+};

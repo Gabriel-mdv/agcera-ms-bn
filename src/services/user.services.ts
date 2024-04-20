@@ -1,7 +1,7 @@
-import Store from '@database/models/store'
-import User from '@database/models/user'
-import { UserRolesEnum } from '@src/types/user.types'
-import { WhereOptions } from 'sequelize'
+import Store from '@database/models/store';
+import User from '@database/models/user';
+import { UserRolesEnum } from '@src/types/user.types';
+import { WhereOptions } from 'sequelize';
 
 class userService {
   static async registerUser(
@@ -24,36 +24,36 @@ class userService {
       location,
       storeId,
       role,
-    })
+    });
 
-    const newUserObject = newUser.toJSON()
+    const newUserObject = newUser.toJSON();
 
     // delete the password from the object
-    delete (newUserObject as Partial<User>).password
+    delete (newUserObject as Partial<User>).password;
 
-    return newUserObject
+    return newUserObject;
   }
 
   //login service
   static async loginUser(phone: string) {
-    const user = await User.findOne({ where: { phone } })
+    const user = await User.findOne({ where: { phone } });
     if (!user) {
-      return null
+      return null;
     }
-    return user
+    return user;
   }
 
   //get user by id
   static async getUserById(id: string) {
-    const user = await User.findByPk(id, { attributes: { exclude: ['password'] } })
+    const user = await User.findByPk(id, { attributes: { exclude: ['password'] } });
     if (!user) {
-      return null
+      return null;
     }
-    return user
+    return user;
   }
 
   static async getOneUser(where: WhereOptions) {
-    return await User.findOne({ where: { ...where }, attributes: { exclude: ['password'] } })
+    return await User.findOne({ where: { ...where }, attributes: { exclude: ['password'] } });
   }
 
   //update user
@@ -63,8 +63,8 @@ class userService {
       where,
       attributes: { exclude: ['password'] },
       include: [{ model: Store, as: 'store' }],
-    })
+    });
   }
 }
 
-export default userService
+export default userService;

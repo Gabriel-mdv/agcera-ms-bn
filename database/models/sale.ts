@@ -1,4 +1,4 @@
-import sequelize from '@database/connection'
+import sequelize from '@database/connection';
 import {
   DataTypes,
   type ForeignKey,
@@ -7,10 +7,10 @@ import {
   Model,
   NonAttribute,
   CreationOptional,
-} from 'sequelize'
-import User from './user'
-import Store from './store'
-import { ClientTypesEnum } from '@src/types/user.types'
+} from 'sequelize';
+import User from './user';
+import Store from './store';
+import { ClientTypesEnum } from '@src/types/user.types';
 
 export enum PaymentMethodsEnum {
   CASH = 'CASH',
@@ -18,21 +18,21 @@ export enum PaymentMethodsEnum {
 }
 
 class Sale extends Model<InferAttributes<Sale>, InferCreationAttributes<Sale>> {
-  declare readonly id: string | undefined
+  declare readonly id: string | undefined;
 
   // The client who made the sale, if he is not registered in the system use a phone number.
-  declare clientId: ForeignKey<User['id']> | string
-  declare clientType: ClientTypesEnum
-  declare storeId: ForeignKey<Store['id']>
+  declare clientId: ForeignKey<User['id']> | string;
+  declare clientType: ClientTypesEnum;
+  declare storeId: ForeignKey<Store['id']>;
 
-  declare paymentMethod: PaymentMethodsEnum
+  declare paymentMethod: PaymentMethodsEnum;
 
-  declare readonly client: NonAttribute<User> | undefined
-  declare readonly store: NonAttribute<Store>
+  declare readonly client: NonAttribute<User> | undefined;
+  declare readonly store: NonAttribute<Store>;
 
-  declare readonly createdAt: CreationOptional<Date>
-  declare updatedAt: Date | undefined
-  declare deletedAt: Date | undefined
+  declare readonly createdAt: CreationOptional<Date>;
+  declare updatedAt: Date | undefined;
+  declare deletedAt: Date | undefined;
 }
 
 Sale.init(
@@ -83,9 +83,9 @@ Sale.init(
     modelName: 'sale',
     tableName: 'Sales',
   }
-)
+);
 
-Sale.belongsTo(User, { foreignKey: 'clientId', as: 'client' })
-Sale.belongsTo(Store, { foreignKey: 'storeId', as: 'store' })
+Sale.belongsTo(User, { foreignKey: 'clientId', as: 'client' });
+Sale.belongsTo(Store, { foreignKey: 'storeId', as: 'store' });
 
-export default Sale
+export default Sale;

@@ -1,14 +1,14 @@
-import { PaymentMethodsEnum } from '@database/models/sale'
-import { ClientTypesEnum } from '@src/types/user.types'
-import Joi from 'joi'
+import { PaymentMethodsEnum } from '@database/models/sale';
+import { ClientTypesEnum } from '@src/types/user.types';
+import Joi from 'joi';
 
-const paymentMethodValues = Object.values(PaymentMethodsEnum)
-const clientTypeValues = Object.values(ClientTypesEnum)
+const paymentMethodValues = Object.values(PaymentMethodsEnum);
+const clientTypeValues = Object.values(ClientTypesEnum);
 
 export type CreateSaleProduct = {
-  productId: string
-  quantity: number
-}
+  productId: string;
+  quantity: number;
+};
 
 const createSaleSchema = Joi.object({
   products: Joi.object()
@@ -42,6 +42,6 @@ const createSaleSchema = Joi.object({
     'string.base': 'shopId should be a string',
     'any.required': 'shopId is required',
   }),
-})
+});
 
-export const validateCreateSale = (data: any) => createSaleSchema.validate(data)
+export const validateCreateSale = (data: any) => createSaleSchema.validate(data);

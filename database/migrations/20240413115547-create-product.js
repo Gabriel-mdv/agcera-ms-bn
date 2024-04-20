@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -23,7 +23,7 @@ module.exports = {
       type: {
         type: Sequelize.ENUM('STANDARD', 'SPECIAL'),
         allowNull: false,
-        defaultValue: 'STANDARD'
+        defaultValue: 'STANDARD',
       },
       description: Sequelize.STRING,
       createdAt: {
@@ -33,9 +33,9 @@ module.exports = {
       },
       updatedAt: Sequelize.DATE,
       deletedAt: Sequelize.DATE,
-    })
+    });
   },
   async down(queryInterface) {
-    await queryInterface.dropTable('Products')
+    await queryInterface.dropTable('Products');
   },
-}
+};
