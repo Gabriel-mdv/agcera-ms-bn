@@ -1,9 +1,17 @@
 import Store from '@database/models/store';
 import User from '@database/models/user';
+import { GetAllRequestQuery } from '@src/types/sales.types';
 import { UserRolesEnum } from '@src/types/user.types';
-import { WhereOptions } from 'sequelize';
+import { findQueryGenerators } from '@src/utils/generators';
+import { IncludeOptions, WhereOptions } from 'sequelize';
 
 class userService {
+  static DEFAULT_STORE_INCLUDES: IncludeOptions = {
+    model: Store,
+    as: 'store',
+    attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+  };
+
   static async registerUser(
     name: string,
     hashedPassword: string,
@@ -57,13 +65,14 @@ class userService {
   }
 
   //update user
-  static async getAllUsers({ where }: { where: WhereOptions }) {
-    return await User.findAll({
-      // where: { deletedAt: null },
-      where,
-      attributes: { exclude: ['password'] },
-      include: [{ model: Store, as: 'store' }],
-    });
+  static async getAllUsers(queryData?: GetAllRequestQuery, where?: WhereOptions, includes?: IncludeOptions[]) {
+    const include: IncludeOptions[] = [this.DEFAULT_STORE_INCLUDES, ...(includes ?? [])];
+
+    const { count, rows } = await User.findAndCountAll(
+      findQueryGenerators(Store.getAttributes(), queryData, { where, include, attributes: { exclude: ['password'] } })
+    );
+
+    return { users: rows, total: count };
   }
 }
 

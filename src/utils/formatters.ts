@@ -3,7 +3,6 @@ import { GetAllRequestQuery } from '@src/types/sales.types';
 
 // Throws an error if the sort query is invalid
 export const formatSortQuery = (data: string): GetAllRequestQuery['sort'] => {
-  console.log(data);
   const sorts = data.split(',').map((sort) => sort.trim());
   const sortQuery: GetAllRequestQuery['sort'] = {};
 

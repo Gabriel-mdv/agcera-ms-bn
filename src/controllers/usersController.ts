@@ -182,18 +182,18 @@ class UsersController {
   // get all users
   static async getAllUsers(req: ExtendedRequest, res: Response): Promise<Response> {
     const user = req.user!;
+    const { search, limit, skip, sort } = req.query;
 
     const where: WhereOptions = {};
-
     if (user.role === 'keeper') {
       where['storeId'] = user.storeId;
     }
 
-    const users = await userService.getAllUsers({ where });
+    const { users, total } = await userService.getAllUsers({ search, limit, skip, sort }, where);
 
     return res.status(200).json({
       status: 'success',
-      data: users,
+      data: { users, total },
     });
   }
 
