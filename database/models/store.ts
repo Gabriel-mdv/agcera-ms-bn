@@ -10,6 +10,7 @@ import {
 } from 'sequelize';
 import StoreProduct from './storeproduct';
 import User from './user';
+import Sale from './sale';
 
 class Store extends Model<InferAttributes<Store>, InferCreationAttributes<Store>> {
   declare id: CreationOptional<string>;
@@ -24,10 +25,12 @@ class Store extends Model<InferAttributes<Store>, InferCreationAttributes<Store>
 
   declare users?: NonAttribute<User[]>;
   declare products?: NonAttribute<StoreProduct[]>;
+  declare sales?: NonAttribute<Sale[]>;
 
   declare static associations: {
     users: Association<User, Store>;
     products: Association<StoreProduct, Store>;
+    sales: Association<Sale, Store>;
   };
 }
 

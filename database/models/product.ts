@@ -11,6 +11,8 @@ import {
 } from 'sequelize';
 import Store from './user';
 import Variation from './variation';
+import SaleProduct from './saleproduct';
+import StoreProduct from './storeproduct';
 
 class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Product>> {
   declare id: CreationOptional<string>;
@@ -19,12 +21,14 @@ class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Pr
   declare image: CreationOptional<string>;
   declare description: string | null;
 
-  declare variations?: NonAttribute<Variation[]>;
-  declare stores?: NonAttribute<Store[]>;
+  declare variations: NonAttribute<Variation[]>;
+  declare stores?: NonAttribute<StoreProduct[]>;
+  declare sales?: NonAttribute<SaleProduct[]>;
 
   declare static associations: {
     variations: Association<Variation, Product>;
-    stores: Association<Product, Store>;
+    stores: Association<StoreProduct, Store>;
+    sales: Association<SaleProduct, Product>;
   };
 
   declare readonly createdAt: CreationOptional<Date>;

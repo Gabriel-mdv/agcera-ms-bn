@@ -9,8 +9,11 @@ import {
   type InferCreationAttributes,
   Model,
   CreationOptional,
+  NonAttribute,
+  Association,
 } from 'sequelize';
 import Store from './store';
+import Sale from './sale';
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<string>;
@@ -24,6 +27,12 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare isActive: boolean | null;
 
   declare storeId: ForeignKey<Store['id']>;
+
+  declare sales?: NonAttribute<Sale[]>;
+
+  declare static associations: {
+    sales: Association<Sale, User>;
+  };
 
   declare readonly createdAt: CreationOptional<Date>;
   declare updatedAt: Date | null;

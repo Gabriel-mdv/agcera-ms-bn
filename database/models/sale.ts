@@ -7,10 +7,12 @@ import {
   Model,
   NonAttribute,
   CreationOptional,
+  Association,
 } from 'sequelize';
 import User from './user';
 import Store from './store';
 import { ClientTypesEnum } from '@src/types/user.types';
+import SaleProduct from './saleproduct';
 
 export enum PaymentMethodsEnum {
   CASH = 'CASH',
@@ -18,17 +20,19 @@ export enum PaymentMethodsEnum {
 }
 
 class Sale extends Model<InferAttributes<Sale>, InferCreationAttributes<Sale>> {
-  declare readonly id: string | undefined;
+  declare readonly id: CreationOptional<string>;
+  declare paymentMethod: PaymentMethodsEnum;
 
   // The client who made the sale, if he is not registered in the system use a phone number.
   declare clientId: ForeignKey<User['id']> | string;
   declare clientType: ClientTypesEnum;
   declare storeId: ForeignKey<Store['id']>;
 
-  declare paymentMethod: PaymentMethodsEnum;
+  declare products: NonAttribute<SaleProduct[]>;
 
-  declare readonly client: NonAttribute<User> | undefined;
-  declare readonly store: NonAttribute<Store>;
+  declare static associations: {
+    products: Association<SaleProduct, Sale>;
+  };
 
   declare readonly createdAt: CreationOptional<Date>;
   declare updatedAt: Date | undefined;
@@ -51,11 +55,7 @@ Sale.init(
     },
     clientId: {
       allowNull: false,
-      type: DataTypes.UUID,
-      references: {
-        model: 'Users',
-        key: 'id',
-      },
+      type: DataTypes.STRING,
     },
     clientType: {
       allowNull: false,
@@ -82,10 +82,14 @@ Sale.init(
     sequelize,
     modelName: 'sale',
     tableName: 'Sales',
+    paranoid: true,
   }
 );
 
 Sale.belongsTo(User, { foreignKey: 'clientId', as: 'client' });
+User.hasMany(Sale, { foreignKey: 'clientId', as: 'sales' });
+
 Sale.belongsTo(Store, { foreignKey: 'storeId', as: 'store' });
+Store.hasMany(Sale, { foreignKey: 'storeId', as: 'sales' });
 
 export default Sale;

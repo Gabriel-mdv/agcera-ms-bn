@@ -1,14 +1,5 @@
 import sequelize from '@database/connection';
-import {
-  Association,
-  CreationOptional,
-  DataTypes,
-  ForeignKey,
-  InferAttributes,
-  InferCreationAttributes,
-  Model,
-  NonAttribute,
-} from 'sequelize';
+import { CreationOptional, DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import Product from './product';
 import Store from './store';
 
@@ -18,14 +9,6 @@ class StoreProduct extends Model<InferAttributes<StoreProduct>, InferCreationAtt
 
   declare storeId: ForeignKey<Store['id']>;
   declare productId: ForeignKey<Product['id']>;
-
-  declare store?: NonAttribute<Store>;
-  declare product?: NonAttribute<Product>;
-
-  declare static associations: {
-    store: Association<StoreProduct, Store>;
-    product: Association<StoreProduct, Product>;
-  };
 
   declare readonly createdAt: CreationOptional<Date>;
   declare updatedAt: Date | null;

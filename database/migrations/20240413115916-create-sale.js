@@ -18,11 +18,7 @@ module.exports = {
       },
       clientId: {
         allowNull: false,
-        type: Sequelize.UUID,
-        references: {
-          model: 'Users',
-          key: 'id',
-        },
+        type: Sequelize.STRING,
       },
       clientType: {
         allowNull: false,
