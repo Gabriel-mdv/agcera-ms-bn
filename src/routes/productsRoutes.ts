@@ -12,15 +12,15 @@ router.get('/', isLoggedIn, productsController.getAllProducts);
 router.get('/:id', isLoggedIn, validateParams(), productsController.getOneProduct);
 router.post(
   '/',
+  upload.single('image'),
   isAdmin,
   validate(createNewProductSchema),
-  upload.single('image'),
   productsController.createNewProduct
 );
 router.patch(
   '/:id',
-  isAdmin,
   upload.single('image'),
+  isAdmin,
   validateParams(),
   validate(updateProductSchema),
   productsController.updateProduct
