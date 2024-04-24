@@ -3,5 +3,7 @@
   "prettier.printWidth": 120,
   "editor.guides.bracketPairs": true,
   "editor.wordWrap": "on",
-  "editor.wordWrapColumn": 120
+  "editor.wordWrapColumn": 120,
+  "prettier.semi": false,
+  "prettier.useEditorConfig": false
 }

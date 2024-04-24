@@ -20,9 +20,9 @@ module.exports = {
         },
       ],
       {}
-    )
+    );
   },
   async down(queryInterface) {
-    await queryInterface.bulkDelete('SaleProducts', null, {})
+    await queryInterface.bulkDelete('SaleProducts', null, {});
   },
-}
+};

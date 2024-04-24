@@ -9,14 +9,22 @@ module.exports = {
           paymentMethod: 'CASH',
           clientId: '8215a8ea-cf39-4037-81e6-86f6b439dcf7',
           clientType: 'USER',
+          storeId: '143e4667-a81d-12d3-c356-469311174301',
+          createdAt: new Date(),
+        },
+        {
+          id: '7ffdcde2-a8dc-427f-bac2-863f52401fc1',
+          paymentMethod: 'MOMO',
+          clientId: '+250788888881',
+          clientType: 'CLIENT',
           storeId: '143e4667-a81d-12d3-c356-469311174302',
           createdAt: new Date(),
         },
       ],
       {}
-    )
+    );
   },
   async down(queryInterface) {
-    await queryInterface.bulkDelete('Sales', null, {})
+    await queryInterface.bulkDelete('Sales', null, {});
   },
-}
+};

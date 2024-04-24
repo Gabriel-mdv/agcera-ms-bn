@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { UserGendersEnum, UserRolesEnum } from '@src/types/user.types'
-import joi from 'joi'
+import { UserGendersEnum, UserRolesEnum } from '@src/types/user.types';
+import joi from 'joi';
 
 // The schema for the phone number
 export const emailSchema = joi.string().pattern(new RegExp('^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$')).messages({
   'string.pattern.base': 'Please provide a valid Email',
   'string.empty': 'Email cannot be empty',
-})
+});
 
 // The schema for registering a user
 export const userRegisterSchema = joi.object({
@@ -40,7 +40,7 @@ export const userRegisterSchema = joi.object({
     .required(),
   gender: joi.string().valid(...Object.values(UserGendersEnum)),
   location: joi.string(),
-})
+});
 
 // make the same sehcma for updating a user but the fields are not required
 export const userUpdateSchema = joi
@@ -67,7 +67,7 @@ export const userUpdateSchema = joi
       }),
     storeId: joi.string(),
   })
-  .unknown()
+  .unknown();
 
 // The schema for login
 export const userLoginSchema = joi
@@ -79,4 +79,4 @@ export const userLoginSchema = joi
       'any.required': 'Please Enter password',
     }),
   })
-  .unknown()
+  .unknown();

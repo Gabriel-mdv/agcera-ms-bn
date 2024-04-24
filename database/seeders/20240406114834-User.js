@@ -1,5 +1,5 @@
 // Const { v4: uuidv4 } = require('uuid')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -24,7 +24,7 @@ module.exports = {
           password: bcrypt.hashSync('1234', bcrypt.genSaltSync(10)),
           storeId: '143e4667-a81d-12d3-c356-469311174301',
           phone: '+123456789024',
-          role:  'keeper',
+          role: 'keeper',
           createdAt: new Date(),
         },
         {
@@ -49,9 +49,9 @@ module.exports = {
         },
       ],
       {}
-    )
+    );
   },
   async down(queryInterface) {
-    await queryInterface.bulkDelete('Users', null, {})
+    await queryInterface.bulkDelete('Users', null, {});
   },
-}
+};

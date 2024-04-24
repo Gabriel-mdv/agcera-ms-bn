@@ -1,4 +1,4 @@
-import sequelize from '@database/connection'
+import sequelize from '@database/connection';
 import {
   CreationOptional,
   DataTypes,
@@ -7,21 +7,21 @@ import {
   InferCreationAttributes,
   Model,
   ModelValidateOptions,
-} from 'sequelize'
-import Product from './product'
+} from 'sequelize';
+import Product from './product';
 
 class Variation extends Model<InferAttributes<Variation>, InferCreationAttributes<Variation>> {
-  declare id: CreationOptional<string>
-  declare name: string
-  declare description: string | null
-  declare costPrice: number
-  declare sellingPrice: number
+  declare id: CreationOptional<string>;
+  declare name: string;
+  declare description: string | null;
+  declare costPrice: number;
+  declare sellingPrice: number;
 
-  declare productId: ForeignKey<Product['id']>
+  declare productId: ForeignKey<Product['id']>;
 
-  declare readonly createdAt: CreationOptional<Date>
-  declare updatedAt: Date | null
-  declare deletedAt: Date | null
+  declare readonly createdAt: CreationOptional<Date>;
+  declare updatedAt: Date | null;
+  declare deletedAt: Date | null;
 }
 
 Variation.init(
@@ -51,7 +51,7 @@ Variation.init(
       validate: {
         isGreaterThanCostPrice(value: number) {
           if (((this as ModelValidateOptions).costPrice as number) > value) {
-            throw new Error('Selling price must be greater than cost price')
+            throw new Error('Selling price must be greater than cost price');
           }
         },
       },
@@ -79,6 +79,6 @@ Variation.init(
     modelName: 'Variation',
     tableName: 'Variations',
   }
-)
+);
 
-export default Variation
+export default Variation;

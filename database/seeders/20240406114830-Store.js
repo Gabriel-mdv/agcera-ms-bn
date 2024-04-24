@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -6,7 +6,8 @@ module.exports = {
     await queryInterface.bulkInsert(
       'Stores',
       [
-        { // This should always be there. It is the main store
+        {
+          // This should always be there. It is the main store
           id: '143e4667-a81d-12d3-c356-469311174300',
           name: 'main',
           location: 'Maputo 12',
@@ -32,10 +33,10 @@ module.exports = {
         },
       ],
       {}
-    )
+    );
   },
 
   async down(queryInterface) {
-    await queryInterface.bulkDelete('Stores', null, {})
+    await queryInterface.bulkDelete('Stores', null, {});
   },
-}
+};

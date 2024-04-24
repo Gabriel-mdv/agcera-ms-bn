@@ -1,6 +1,6 @@
 // import { sequelize } from '@database/models/index';
-import sequelize from '@database/connection'
-import { UserGendersEnum, UserRolesEnum } from '@src/types/user.types'
+import sequelize from '@database/connection';
+import { UserGendersEnum, UserRolesEnum } from '@src/types/user.types';
 import {
   // Association,
   DataTypes,
@@ -9,25 +9,34 @@ import {
   type InferCreationAttributes,
   Model,
   CreationOptional,
-} from 'sequelize'
-import Store from './store'
+  NonAttribute,
+  Association,
+} from 'sequelize';
+import Store from './store';
+import Sale from './sale';
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-  declare id: CreationOptional<string>
-  declare name: string
-  declare password: string
-  declare phone: string
-  declare location: string
-  declare role: UserRolesEnum
-  declare email: string | null
-  declare gender: string | null
-  declare isActive: boolean | null
+  declare id: CreationOptional<string>;
+  declare name: string;
+  declare password: string;
+  declare phone: string;
+  declare location: string;
+  declare role: UserRolesEnum;
+  declare email: string | null;
+  declare gender: string | null;
+  declare isActive: boolean | null;
 
-  declare storeId: ForeignKey<Store['id']>
+  declare storeId: ForeignKey<Store['id']>;
 
-  declare readonly createdAt: CreationOptional<Date>
-  declare updatedAt: Date | null
-  declare deletedAt: Date | null
+  declare sales?: NonAttribute<Sale[]>;
+
+  declare static associations: {
+    sales: Association<Sale, User>;
+  };
+
+  declare readonly createdAt: CreationOptional<Date>;
+  declare updatedAt: Date | null;
+  declare deletedAt: Date | null;
 }
 
 User.init(
@@ -105,6 +114,6 @@ User.init(
     tableName: 'Users',
     paranoid: true,
   }
-)
+);
 
-export default User
+export default User;
