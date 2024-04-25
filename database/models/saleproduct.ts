@@ -1,19 +1,19 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, ForeignKey, CreationOptional } from 'sequelize'
-import Sale from './sale'
-import sequelize from '@database/connection'
-import Product from './product'
+import { Model, DataTypes, InferAttributes, InferCreationAttributes, ForeignKey, CreationOptional } from 'sequelize';
+import Sale from './sale';
+import sequelize from '@database/connection';
+import Product from './product';
 
 class SaleProduct extends Model<InferAttributes<SaleProduct>, InferCreationAttributes<SaleProduct>> {
-  declare readonly id: string | undefined
+  declare readonly id: string | undefined;
 
-  declare saleId: ForeignKey<Sale['id']>
-  declare productId: ForeignKey<Product['id']>
+  declare saleId: ForeignKey<Sale['id']>;
+  declare productId: ForeignKey<Product['id']>;
 
-  declare quantity: number | undefined
+  declare quantity: number | undefined;
 
-  declare readonly createdAt: CreationOptional<Date>
-  declare updatedAt: Date | undefined
-  declare deletedAt: Date | undefined
+  declare readonly createdAt: CreationOptional<Date>;
+  declare updatedAt: Date | undefined;
+  declare deletedAt: Date | undefined;
 }
 SaleProduct.init(
   {
@@ -57,15 +57,24 @@ SaleProduct.init(
     modelName: 'SaleProduct',
     tableName: 'SaleProducts',
   }
-)
+);
 
 SaleProduct.belongsTo(Sale, {
   foreignKey: 'saleId',
   as: 'sale',
-})
+});
+Sale.hasMany(SaleProduct, {
+  foreignKey: 'saleId',
+  as: 'products',
+});
+
 SaleProduct.belongsTo(Product, {
   foreignKey: 'productId',
   as: 'product',
-})
+});
+Product.hasMany(SaleProduct, {
+  foreignKey: 'productId',
+  as: 'sales',
+});
 
-export default SaleProduct
+export default SaleProduct;

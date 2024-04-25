@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -18,11 +18,7 @@ module.exports = {
       },
       clientId: {
         allowNull: false,
-        type: Sequelize.UUID,
-        references: {
-          model: 'Users',
-          key: 'id',
-        },
+        type: Sequelize.STRING,
       },
       clientType: {
         allowNull: false,
@@ -44,9 +40,9 @@ module.exports = {
       },
       updatedAt: Sequelize.DATE,
       deletedAt: Sequelize.DATE,
-    })
+    });
   },
   async down(queryInterface) {
-    await queryInterface.dropTable('Sales')
+    await queryInterface.dropTable('Sales');
   },
-}
+};

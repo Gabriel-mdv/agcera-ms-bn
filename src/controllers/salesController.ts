@@ -1,13 +1,11 @@
-import SaleServices from '@src/services/sale.services'
-import { RequestWithUser } from '@src/types/common.types'
-import { GetAllRequestQuery } from '@src/types/sales.types'
-import { ClientTypesEnum } from '@src/types/user.types'
-import { formatSortQuery } from '@src/utils/formatters'
-import { type Response } from 'express'
-import { IncludeOptions, WhereOptions } from 'sequelize'
+import SaleServices from '@src/services/sale.services';
+import { ExtendedRequest } from '@src/types/common.types';
+import { ClientTypesEnum } from '@src/types/user.types';
+import { Request, type Response } from 'express';
+import { IncludeOptions, WhereOptions } from 'sequelize';
 
 class SalesController {
-  static async createSale(req: RequestWithUser, res: Response): Promise<Response | undefined> {
+  static async createSale(req: Request, res: Response): Promise<Response | undefined> {
     try {
       // const { error } = validateCreateSale(req.body)
       // if (error) {
@@ -30,48 +28,35 @@ class SalesController {
       return res.status(200).json({
         status: 200,
         message: 'Sale created successfully',
-      })
+      });
 
       // const sale = await SaleServices.createSale(user, products, paymentMethod, clientId, clientType, shopId)
     } catch (error) {
       return res.status(500).json({
         status: 'fail',
         message: 'Internal server error',
-      })
+      });
     }
   }
 
-  static async getAllSales(
-    req: RequestWithUser<object, object, object, GetAllRequestQuery<string>>,
-    res: Response
-  ): Promise<Response> {
+  static async getAllSales(req: ExtendedRequest, res: Response): Promise<Response> {
     try {
-      const { role: userRole, id: userId } = req.user!
-      const { search, limit, skip, sort } = req.query
+      const { role: userRole, id: userId } = req.user!;
+      const { search, limit, skip, sort } = req.query;
 
-      let formattedSort = null
-      try {
-        formattedSort = sort && formatSortQuery(sort)
-      } catch (e: any) {
-        return res.status(400).json({
-          status: 400,
-          message: e.message,
-        })
-      }
-
-      const where: WhereOptions = {}
-      const include: IncludeOptions[] = []
+      const where: WhereOptions = {};
+      const include: IncludeOptions[] = [];
 
       switch (userRole) {
         case 'user':
-          where['clientId'] = userId
-          where['clientType'] = ClientTypesEnum.USER
-          break
+          where['clientId'] = userId;
+          where['clientType'] = ClientTypesEnum.USER;
+          break;
         case 'keeper':
           // include.push({ model: Store, as: 'store', where: { keeperId: userId } })
-          break
+          break;
         case 'admin':
-          break
+          break;
       }
 
       const { sales, total } = await SaleServices.getAllSales(
@@ -79,11 +64,11 @@ class SalesController {
           search,
           limit,
           skip,
-          sort: formattedSort as GetAllRequestQuery['sort'],
+          sort,
         },
         where,
         include
-      )
+      );
 
       return res.status(200).json({
         status: 200,
@@ -91,14 +76,14 @@ class SalesController {
           data: sales,
           total: total,
         },
-      })
+      });
     } catch (error) {
       return res.status(500).json({
         status: 500,
         message: 'Internal server error',
-      })
+      });
     }
   }
 }
 
-export default SalesController
+export default SalesController;

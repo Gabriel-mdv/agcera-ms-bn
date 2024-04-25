@@ -1,5 +1,5 @@
-import sequelize from '@database/connection'
-import { ProductTypesEnum } from '@src/types/product.types'
+import sequelize from '@database/connection';
+import { ProductTypesEnum } from '@src/types/product.types';
 import {
   Association,
   CreationOptional,
@@ -8,28 +8,32 @@ import {
   InferCreationAttributes,
   Model,
   NonAttribute,
-} from 'sequelize'
-import Store from './user'
-import Variation from './variation'
+} from 'sequelize';
+import Store from './user';
+import Variation from './variation';
+import SaleProduct from './saleproduct';
+import StoreProduct from './storeproduct';
 
 class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Product>> {
-  declare id: CreationOptional<string>
-  declare name: string
-  declare type: ProductTypesEnum
-  declare image: CreationOptional<string>
-  declare description: string | null
+  declare id: CreationOptional<string>;
+  declare name: string;
+  declare type: ProductTypesEnum;
+  declare image: CreationOptional<string>;
+  declare description: string | null;
 
-  declare variations?: NonAttribute<Variation[]>
-  declare stores?: NonAttribute<Store[]>
+  declare variations: NonAttribute<Variation[]>;
+  declare stores?: NonAttribute<StoreProduct[]>;
+  declare sales?: NonAttribute<SaleProduct[]>;
 
   declare static associations: {
-    variations: Association<Variation, Product>
-    stores: Association<Product, Store>
-  }
+    variations: Association<Variation, Product>;
+    stores: Association<StoreProduct, Store>;
+    sales: Association<SaleProduct, Product>;
+  };
 
-  declare readonly createdAt: CreationOptional<Date>
-  declare updatedAt: Date | null
-  declare deletedAt: Date | null
+  declare readonly createdAt: CreationOptional<Date>;
+  declare updatedAt: Date | null;
+  declare deletedAt: Date | null;
 }
 
 Product.init(
@@ -71,17 +75,17 @@ Product.init(
     tableName: 'Products',
     paranoid: true,
   }
-)
+);
 
 Product.hasMany(Variation, {
   foreignKey: 'productId',
   as: 'variations',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
-})
+});
 Variation.belongsTo(Product, {
   foreignKey: 'productId',
   as: 'product',
-})
+});
 
-export default Product
+export default Product;

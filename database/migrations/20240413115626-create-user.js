@@ -68,9 +68,9 @@ module.exports = {
       },
       updatedAt: Sequelize.DATE,
       deletedAt: Sequelize.DATE,
-    })
+    });
   },
   async down(queryInterface) {
-    await queryInterface.dropTable('Users')
+    await queryInterface.dropTable('Users');
   },
-}
+};

@@ -1,4 +1,4 @@
-import Joi from 'joi'
+import Joi from 'joi';
 
 export const storeRegisterSchema = Joi.object({
   name: Joi.string().required().messages({
@@ -16,7 +16,7 @@ export const storeRegisterSchema = Joi.object({
       'any.required': 'Phone number is a required field',
     }),
   isActive: Joi.bool(),
-})
+});
 
 export const storeUpdateSchema = Joi.object({
   name: Joi.string().messages({
@@ -33,4 +33,4 @@ export const storeUpdateSchema = Joi.object({
       'any.required': 'Phone number is a required field',
     }),
   isActive: Joi.bool(),
-})
+});
