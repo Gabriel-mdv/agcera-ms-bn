@@ -30,7 +30,6 @@ COPY . /app
 
 # install packages and build
 RUN npm install
-RUN npm install typescript
 RUN npm run build
 
 # allow the start script to be executable

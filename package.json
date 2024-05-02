@@ -10,7 +10,7 @@
     "db:rollback": "sequelize db:migrate:undo:all",
     "build": "tsc && tsc-alias",
     "start": "npm run db:migrate && npm run db:seed && node build/server.js",
-    "build:docker": "make build",
+    "build:docker": "make build_image",
     "prepare": "husky",
     "lint": "eslint . --fix",
     "format": "prettier --write ."
@@ -57,7 +57,6 @@
     "prettier": "^3.2.5",
     "sequelize-cli": "^6.6.2",
     "ts-node": "^10.9.2",
-    "tsc": "^2.0.4",
     "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
     "tslib": "^2.6.2",
