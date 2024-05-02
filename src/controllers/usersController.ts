@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { Op, WhereOptions } from 'sequelize';
 import userService from '../services/user.services';
-import { generateToken, verifyToken } from '../utils/jwtFunctions';
+import { /* defaultTokenExpirySeconds,*/ generateToken, verifyToken } from '../utils/jwtFunctions';
 import sendEmail from '../utils/sendEmail';
 import { BaseController } from '.';
 
@@ -80,9 +80,17 @@ class UsersController extends BaseController {
     }
 
     // generate the toke for the user
-    const token = generateToken({ id: user.id, role: user.role });
+    const tokenDuration = 7 * 24 * 60 * 60;
+    const token = generateToken({ id: user.id, role: user.role, expiresIn: tokenDuration });
     // store the token in the cookies
-    res.cookie('AuthToken', token, { httpOnly: true, secure: true, sameSite: 'none' });
+    // multiply by 1000 to convert to milliseconds as the expiresIn is in seconds
+    res.cookie('AuthToken', token, { httpOnly: true, secure: true, sameSite: 'none', maxAge: tokenDuration * 1000 });
+    res.cookie('AuthTokenExists', true, {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'none',
+      maxAge: tokenDuration * 1000,
+    });
 
     delete (user.dataValues as { [key: string]: any }).password;
 
@@ -95,6 +103,7 @@ class UsersController extends BaseController {
   // logout the user
   async Logout(req: Request, res: Response): Promise<Response> {
     res.clearCookie('AuthToken');
+    res.clearCookie('AuthTokenExists');
 
     return res.status(200).json({
       status: 'success',
@@ -227,6 +236,16 @@ class UsersController extends BaseController {
     return res.status(200).json({
       status: 'success',
       data: foundUser,
+    });
+  }
+
+  // get logged in user profile
+  async getProfile(req: ExtendedRequest, res: Response): Promise<Response> {
+    const user = req.user!;
+
+    return res.status(200).json({
+      status: 'success',
+      data: user,
     });
   }
 
