@@ -6,12 +6,19 @@ import morgan from 'morgan';
 import sequelize from './database/connection';
 import router from './src/routes';
 import { globalErrorHandler } from '@src/utils/errors';
+import Cors from 'cors';
 
 dotenv.config();
 const app = Express();
 
 // All app configuration
 app.use(morgan('dev'));
+app.use(
+  Cors({
+    origin: ['http://localhost:5173'],
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

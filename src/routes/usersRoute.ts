@@ -14,6 +14,7 @@ router.post('/logout', usersController.Logout);
 router.put('/reset/:token', usersController.resetPassword);
 
 router.get('/', isStoreKeeperUp, usersController.getAllUsers);
+router.get('/me', isLoggedIn, usersController.getProfile);
 router.get('/:id', isLoggedIn, validateParams(), usersController.getSingleUser);
 router.patch('/', isAdmin, validate(userUpdateSchema), usersController.updateUser);
 router.delete('/:id', isAdmin, validateParams(), usersController.deleteUser);
