@@ -118,22 +118,25 @@ class UsersController extends BaseController {
     // check the user exists
     const user = await userService.getOneUser({ email });
 
-    if (!user) {
-      return res.status(404).json({
-        status: 'fail',
-        message: 'User with the provided email not found',
-      });
+    if (user) {
+      // If no user found do nothing, this is to prevent information leakage about our user emails 😝
+      // generate the token
+      const token = generateToken({ id: user.id }, 15 * 60 * 60);
+
+      // send the token to the user's email
+      const emailSent = await sendEmail(
+        email,
+        'Password Reset',
+        `Follow the link below to reset your password:\n${process.env.FRONTEND_URL}/${process.env.FRONTEND_RESET_PATH || '/rest-password'}/${token}\n\nThis link will expire in 15 minutes.`
+      );
+
+      if (!emailSent) {
+        return res.status(500).json({
+          status: 'fail',
+          message: 'Error sending email. Please try again later.',
+        });
+      }
     }
-
-    // generate the token
-    const token = generateToken({ id: user.id });
-
-    // send the token to the user's email
-    await sendEmail(
-      email,
-      'Password Reset',
-      `Please follow the link to reset the password http://localhost:4000/api/v1/users/reset/${token}, the token expires in 24 hours.`
-    );
 
     // send the token to the user's phone number
     return res.status(200).json({

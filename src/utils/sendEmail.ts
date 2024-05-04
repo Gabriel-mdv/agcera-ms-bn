@@ -5,12 +5,14 @@ dotenv.config();
 async function sendEmail(user_email: string, subject: string, text: string): Promise<boolean> {
   console.log(process.env.COMPANY_EMAIL);
   console.log(process.env.COMPANY_APP_PASSWORD);
+  console.log(user_email);
 
   // Create a transporter using SMTP
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    port: 465,
+    secure: true,
+
     auth: {
       user: process.env.COMPANY_EMAIL,
       pass: process.env.COMPANY_APP_PASSWORD,

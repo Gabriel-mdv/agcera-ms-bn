@@ -2,10 +2,11 @@
 import { UserGendersEnum, UserRolesEnum } from '@src/types/user.types';
 import joi from 'joi';
 
-// The schema for the phone number
-export const emailSchema = joi.string().pattern(new RegExp('^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$')).messages({
-  'string.pattern.base': 'Please provide a valid Email',
-  'string.empty': 'Email cannot be empty',
+export const emailSchema = joi.object({
+  email: joi.string().email().required(),
+});
+export const passwordSchema = joi.object({
+  password: joi.string().min(4).required(),
 });
 
 // The schema for registering a user
