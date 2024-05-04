@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { Op, WhereOptions } from 'sequelize';
 import userService from '../services/user.services';
-import { generateToken, verifyToken } from '../utils/jwtFunctions';
+import { /* defaultTokenExpirySeconds,*/ generateToken, verifyToken } from '../utils/jwtFunctions';
 import sendEmail from '../utils/sendEmail';
 import { BaseController } from '.';
 
@@ -80,9 +80,17 @@ class UsersController extends BaseController {
     }
 
     // generate the toke for the user
-    const token = generateToken({ id: user.id, role: user.role });
+    const tokenDuration = 7 * 24 * 60 * 60;
+    const token = generateToken({ id: user.id, role: user.role, expiresIn: tokenDuration });
     // store the token in the cookies
-    res.cookie('AuthToken', token, { httpOnly: true, secure: true, sameSite: 'none' });
+    // multiply by 1000 to convert to milliseconds as the expiresIn is in seconds
+    res.cookie('AuthToken', token, { httpOnly: true, secure: true, sameSite: 'none', maxAge: tokenDuration * 1000 });
+    res.cookie('AuthTokenExists', true, {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'none',
+      maxAge: tokenDuration * 1000,
+    });
 
     delete (user.dataValues as { [key: string]: any }).password;
 
@@ -95,6 +103,7 @@ class UsersController extends BaseController {
   // logout the user
   async Logout(req: Request, res: Response): Promise<Response> {
     res.clearCookie('AuthToken');
+    res.clearCookie('AuthTokenExists');
 
     return res.status(200).json({
       status: 'success',
@@ -109,22 +118,25 @@ class UsersController extends BaseController {
     // check the user exists
     const user = await userService.getOneUser({ email });
 
-    if (!user) {
-      return res.status(404).json({
-        status: 'fail',
-        message: 'User with the provided email not found',
-      });
+    if (user) {
+      // If no user found do nothing, this is to prevent information leakage about our user emails 😝
+      // generate the token
+      const token = generateToken({ id: user.id }, 15 * 60 * 60);
+
+      // send the token to the user's email
+      const emailSent = await sendEmail(
+        email,
+        'Password Reset',
+        `Follow the link below to reset your password:\n${process.env.FRONTEND_URL}/${process.env.FRONTEND_RESET_PATH || '/rest-password'}/${token}\n\nThis link will expire in 15 minutes.`
+      );
+
+      if (!emailSent) {
+        return res.status(500).json({
+          status: 'fail',
+          message: 'Error sending email. Please try again later.',
+        });
+      }
     }
-
-    // generate the token
-    const token = generateToken({ id: user.id });
-
-    // send the token to the user's email
-    await sendEmail(
-      email,
-      'Password Reset',
-      `Please follow the link to reset the password http://localhost:4000/api/v1/users/reset/${token}, the token expires in 24 hours.`
-    );
 
     // send the token to the user's phone number
     return res.status(200).json({
@@ -227,6 +239,16 @@ class UsersController extends BaseController {
     return res.status(200).json({
       status: 'success',
       data: foundUser,
+    });
+  }
+
+  // get logged in user profile
+  async getProfile(req: ExtendedRequest, res: Response): Promise<Response> {
+    const user = req.user!;
+
+    return res.status(200).json({
+      status: 'success',
+      data: user,
     });
   }
 
