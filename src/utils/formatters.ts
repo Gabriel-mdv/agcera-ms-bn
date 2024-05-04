@@ -1,5 +1,6 @@
 import { SortDirectionEnum } from '@src/types/common.types';
 import { GetAllRequestQuery } from '@src/types/sales.types';
+import { Request } from 'express';
 
 // Throws an error if the sort query is invalid
 export const formatSortQuery = (data: string): GetAllRequestQuery['sort'] => {
@@ -16,4 +17,8 @@ export const formatSortQuery = (data: string): GetAllRequestQuery['sort'] => {
   }
 
   return sortQuery;
+};
+
+export const getBackendUrl = (req: Request) => {
+  return req.protocol + '://' + req.get('host');
 };
