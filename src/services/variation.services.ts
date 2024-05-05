@@ -7,7 +7,7 @@ export default class VariationServices {
     return Variation.bulkCreate(variations.map((variation: any) => ({ ...variation, productId })));
   }
 
-  static async updateOrCreateManyVariations(productId: string, data: any): Promise<Variation | undefined> {
+  static async updateOrCreateVariation(productId: string, data: any): Promise<Variation | undefined> {
     // update or create variation
     const product = await ProductServices.getProductByPk(productId);
     if (!product) return;

@@ -43,7 +43,7 @@ export default class ProductServices {
 
   // update product
   static async updateProduct(id: string, data: any) {
-    const { name, image, description } = data;
+    const { name, image } = data;
     const product = await Product.findOne({
       where: { id },
       include: [this.DEFAULT_VARIATION_INCLUDE],
@@ -52,7 +52,6 @@ export default class ProductServices {
 
     name && (product.name = name);
     image && (product.image = image);
-    description && (product.description = description);
 
     return await product.save();
   }
