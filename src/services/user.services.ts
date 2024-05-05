@@ -5,7 +5,7 @@ import { UserRolesEnum } from '@src/types/user.types';
 import { findQueryGenerators } from '@src/utils/generators';
 import { IncludeOptions, WhereOptions } from 'sequelize';
 
-class userService {
+class UserService {
   static DEFAULT_STORE_INCLUDES: IncludeOptions = {
     model: Store,
     as: 'store',
@@ -60,8 +60,8 @@ class userService {
     return user;
   }
 
-  static async getOneUser(where: WhereOptions) {
-    return await User.findOne({ where: { ...where }, attributes: { exclude: ['password'] } });
+  static async getOneUser(where: WhereOptions, deleted: boolean = false) {
+    return await User.findOne({ paranoid: deleted, where: { ...where }, attributes: { exclude: ['password'] } });
   }
 
   //update user
@@ -76,4 +76,4 @@ class userService {
   }
 }
 
-export default userService;
+export default UserService;

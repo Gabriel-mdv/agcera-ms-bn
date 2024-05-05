@@ -28,10 +28,12 @@ class Sale extends Model<InferAttributes<Sale>, InferCreationAttributes<Sale>> {
   declare clientType: ClientTypesEnum;
   declare storeId: ForeignKey<Store['id']>;
 
+  declare store: NonAttribute<Store>;
   declare products: NonAttribute<SaleProduct[]>;
 
   declare static associations: {
     products: Association<SaleProduct, Sale>;
+    store: Association<Sale, Store>;
   };
 
   declare readonly createdAt: CreationOptional<Date>;
@@ -91,5 +93,14 @@ User.hasMany(Sale, { foreignKey: 'clientId', as: 'sales' });
 
 Sale.belongsTo(Store, { foreignKey: 'storeId', as: 'store' });
 Store.hasMany(Sale, { foreignKey: 'storeId', as: 'sales' });
+
+SaleProduct.belongsTo(Sale, {
+  foreignKey: 'saleId',
+  as: 'sale',
+});
+Sale.hasMany(SaleProduct, {
+  foreignKey: 'saleId',
+  as: 'products',
+});
 
 export default Sale;

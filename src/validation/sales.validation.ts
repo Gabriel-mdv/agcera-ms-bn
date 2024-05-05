@@ -2,46 +2,26 @@ import { PaymentMethodsEnum } from '@database/models/sale';
 import { ClientTypesEnum } from '@src/types/user.types';
 import Joi from 'joi';
 
-const paymentMethodValues = Object.values(PaymentMethodsEnum);
-const clientTypeValues = Object.values(ClientTypesEnum);
-
 export type CreateSaleProduct = {
   productId: string;
   quantity: number;
 };
 
-const createSaleSchema = Joi.object({
-  products: Joi.object()
-    .pattern(Joi.string().required(), Joi.number().integer().required())
-    .min(1)
-    .required()
-    .messages({
-      'object.base': 'products should be an object of `productId: quantity`',
-    }),
+export const createSaleSchema = Joi.object({
+  products: Joi.object().pattern(Joi.string().required(), Joi.number().integer().required()).min(1).required(),
   paymentMethod: Joi.string()
     .valid(...Object.values(PaymentMethodsEnum))
-    .required()
-    .messages({
-      'string.base': 'payment method should be a string',
-      'string.valid': `payment method should one of [${paymentMethodValues.join(', ')}]`,
-      'any.required': 'payment method is required',
-    }),
-  clientId: Joi.string().required().messages({
-    'string.base': 'clientId should be a string',
-    'any.required': 'clientId is required',
-  }),
+    .required(),
+  clientId: Joi.alternatives()
+    .try(
+      Joi.string()
+        .pattern(/^\+\d{12}$/)
+        .message('Please provide a valid phone number that starts with + and have 12 digits for clientId'),
+      Joi.string().guid().message('Invalid UUID for clientId')
+    )
+    .required(),
   clientType: Joi.string()
     .valid(...Object.values(ClientTypesEnum))
-    .required()
-    .messages({
-      'string.base': 'clientType should be a string',
-      'string.valid': `clientType should be one of [${clientTypeValues.join(', ')}]`,
-      'any.required': 'clientType is required',
-    }),
-  shopId: Joi.string().required().messages({
-    'string.base': 'shopId should be a string',
-    'any.required': 'shopId is required',
-  }),
+    .required(),
+  storeId: Joi.string().uuid().required(),
 });
-
-export const validateCreateSale = (data: any) => createSaleSchema.validate(data);
