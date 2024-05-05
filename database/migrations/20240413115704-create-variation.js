@@ -14,7 +14,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      description: Sequelize.STRING,
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+        defaultValue: ''
+      },
       costPrice: {
         type: Sequelize.DECIMAL,
         allowNull: false,
