@@ -37,7 +37,11 @@ Variation.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    description: DataTypes.STRING,
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      defaultValue: '',
+    },
     costPrice: {
       type: DataTypes.DECIMAL,
       allowNull: false,

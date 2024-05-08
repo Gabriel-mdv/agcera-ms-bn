@@ -6,7 +6,6 @@ export const createNewProductSchema = Joi.object({
   type: Joi.string()
     .valid(...Object.values(ProductTypesEnum))
     .required(),
-  description: Joi.string(),
   variations: Joi.array()
     .items(
       Joi.object({
@@ -23,13 +22,12 @@ export const createNewProductSchema = Joi.object({
 
 export const updateProductSchema = Joi.object({
   name: Joi.string().min(3),
-  description: Joi.string(),
   variations: Joi.array()
     .items(
       Joi.object({
-        name: Joi.string().min(3),
-        costPrice: Joi.number().min(0),
-        sellingPrice: Joi.number().min(Joi.ref('costPrice')),
+        name: Joi.string().min(3).required(),
+        costPrice: Joi.number().min(0).required(),
+        sellingPrice: Joi.number().min(Joi.ref('costPrice')).required(),
         description: Joi.string(),
       })
     )

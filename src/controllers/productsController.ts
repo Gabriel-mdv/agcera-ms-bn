@@ -68,7 +68,7 @@ export default class ProductsController extends BaseController {
 
   // Create product
   async createNewProduct(req: Request, res: Response): Promise<Response> {
-    const { name, type, description, variations } = req.body;
+    const { name, type, variations } = req.body;
 
     // Restrict standard products to have only one variation
     if (type === ProductTypesEnum.STANDARD && variations.length > 1) {
@@ -100,7 +100,7 @@ export default class ProductsController extends BaseController {
     }
 
     // create the product
-    const product = await ProductServices.createNewProduct({ name, type, image: url, description });
+    const product = await ProductServices.createNewProduct({ name, type, image: url });
     if (variations?.length > 0) {
       // Create variations
       await VariationServices.addManyVariations(product.id, variations);
@@ -168,7 +168,7 @@ export default class ProductsController extends BaseController {
       });
     // update or create variations
     for (const variation of variations ?? []) {
-      await VariationServices.updateOrCreateManyVariations(product.id, variation);
+      await VariationServices.updateOrCreateVariation(product.id, variation);
     }
     // Reload the product to get the new variations
     await product.reload();

@@ -19,7 +19,6 @@ class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Pr
   declare name: string;
   declare type: ProductTypesEnum;
   declare image: CreationOptional<string>;
-  declare description: string | null;
 
   declare variations: NonAttribute<Variation[]>;
   declare stores?: NonAttribute<StoreProduct[]>;
@@ -60,7 +59,6 @@ Product.init(
       allowNull: false,
       defaultValue: ProductTypesEnum.STANDARD,
     },
-    description: DataTypes.STRING,
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
