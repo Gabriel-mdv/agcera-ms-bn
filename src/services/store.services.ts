@@ -4,31 +4,24 @@ import { findQueryGenerators } from '@src/utils/generators';
 import { IncludeOptions, WhereOptions } from 'sequelize';
 
 class StoreServices {
-  private store: Store;
-  static DEFAULT_INCLUDES: IncludeOptions[] = [
-    {
-      association: 'users',
-      attributes: { exclude: ['password', 'createdAt', 'updatedAt', 'deletedAt', 'storeId'] },
-    },
-    {
-      association: 'products',
-      include: [
-        {
-          association: 'store',
-          attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-        },
-        {
-          association: 'product',
-          attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-        },
-      ],
-      attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
-    },
-  ];
-
-  constructor() {
-    this.store = new Store();
-  }
+  static DEFAULT_USER_INCLUDES: IncludeOptions = {
+    association: 'users',
+    attributes: { exclude: ['password', 'createdAt', 'updatedAt', 'deletedAt', 'storeId'] },
+  };
+  static DEFAULT_PRODUCTS_INCLUDES: IncludeOptions = {
+    association: 'products',
+    include: [
+      {
+        association: 'store',
+        attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+      },
+      {
+        association: 'product',
+        attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+      },
+    ],
+    attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] },
+  };
 
   // create store
   static async create(data: any) {
@@ -36,9 +29,7 @@ class StoreServices {
   }
 
   // get all stores
-  static async getAllStores(queryData?: GetAllRequestQuery, where?: WhereOptions, includes?: IncludeOptions[]) {
-    const include: IncludeOptions[] = [this.DEFAULT_INCLUDES[0], ...(includes ?? [])];
-
+  static async getAllStores(queryData?: GetAllRequestQuery, where?: WhereOptions, include?: IncludeOptions[]) {
     const { count, rows } = await Store.findAndCountAll(
       findQueryGenerators(Store.getAttributes(), queryData, { where, include })
     );
@@ -47,18 +38,13 @@ class StoreServices {
   }
 
   // get one store
-  static async getOneStore(where: WhereOptions) {
-    return await Store.findOne({
-      where,
-      include: this.DEFAULT_INCLUDES,
-    });
+  static async getOneStore(where: WhereOptions, include?: IncludeOptions[]) {
+    return await Store.findOne({ where, include });
   }
 
   // get store by id
-  static async getStoreById(id: string) {
-    return await Store.findByPk(id, {
-      include: this.DEFAULT_INCLUDES,
-    });
+  static async getStoreById(id: string, include?: IncludeOptions[]) {
+    return await Store.findByPk(id, { include });
   }
 
   // update store

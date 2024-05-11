@@ -13,7 +13,7 @@ import { isAdmin, isLoggedIn, isStoreKeeperUp } from '../middlewares/checkAuth';
 const router: Router = Router();
 const usersController = new UsersController();
 
-router.post('/register', validate(userRegisterSchema), usersController.register);
+router.post('/register', isAdmin, validate(userRegisterSchema), usersController.register);
 router.post('/login', validate(userLoginSchema), usersController.Login);
 router.post('/forgot', validate(emailSchema), usersController.ForgotPasword);
 router.put('/reset/:token', validate(passwordSchema), usersController.resetPassword);

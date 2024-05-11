@@ -10,11 +10,11 @@ import { BaseController } from '.';
 
 class UsersController extends BaseController {
   async register(req: Request, res: Response): Promise<Response> {
-    const { name, email, phone, password, storeId, gender, location, role } = req.body;
+    const { name, email = null, phone, password, storeId, gender, location, role } = req.body;
 
     // Check if user already exists and was not deleted before
     const user = await userService.getOneUser({ [Op.or]: [{ email }, { phone }] });
-    if (user && user.deletedAt === null) {
+    if (user) {
       let message = '';
       if (user.email === email) {
         message = 'Another user with this email already exists.';
@@ -34,6 +34,12 @@ class UsersController extends BaseController {
       return res.status(400).json({
         status: 'fail',
         message: 'No Store found with the provided storeId.',
+      });
+    }
+    if (role === 'admin' && store.name !== 'main') {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'An admin can only be registered in the main store.',
       });
     }
 
@@ -255,6 +261,7 @@ class UsersController extends BaseController {
   // update user profile
   async updateUser(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
+    const { name, email, phone, storeId } = req.body;
 
     const user = await userService.getUserById(id);
     if (!user) {
@@ -264,7 +271,20 @@ class UsersController extends BaseController {
       });
     }
 
-    const { name, email, phone, storeId } = req.body;
+    // Check store exists
+    const store = await StoreServices.getStoreById(storeId);
+    if (!store) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'No Store found with the provided storeId.',
+      });
+    }
+    if (user.role === 'admin' && store.name !== 'main') {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'An admin can only be registered in the main store.',
+      });
+    }
 
     name ? (user.name = name) : null;
     email ? (user.email = email) : null;

@@ -59,15 +59,6 @@ SaleProduct.init(
   }
 );
 
-SaleProduct.belongsTo(Sale, {
-  foreignKey: 'saleId',
-  as: 'sale',
-});
-Sale.hasMany(SaleProduct, {
-  foreignKey: 'saleId',
-  as: 'products',
-});
-
 SaleProduct.belongsTo(Product, {
   foreignKey: 'productId',
   as: 'product',
